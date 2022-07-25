@@ -5,11 +5,18 @@
   "scripts": {
     "dev": "vuepress dev . --open --host \"localhost\"",
     "build": "vuepress build .",
-    "deploy":"bash deploy.sh"
+    "deploy": "bash deploy.sh"
   },
   "devDependencies": {
     "vuepress": "1.8.2",
     "vuepress-theme-reco": "1.6.14"
   },
-  "description": "my-blog"
+  "description": "my-blog",
+  "dependencies": {
+    "@vuepress-reco/vuepress-plugin-bulletin-popover": "^1.6.13",
+    "@vuepress-reco/vuepress-plugin-kan-ban-niang": "^1.0.5",
+    "vue-canvas-effect": "^0.0.12",
+    "vuepress-plugin-cursor-effects": "^1.1.4",
+    "vuepress-plugin-ribbon-animation": "^1.1.3"
+  }
 }
