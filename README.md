@@ -12,9 +12,9 @@ tagline: love & peace
 #   background: '#fff',
 #   borderRadius: '1rem',
 # }
-bgImageStyle: {
-  height: '450px'
-}
+# bgImageStyle: {
+#   height: '450px'
+# }
 ##############################
 #修改之后
 heroImageStyle: {
