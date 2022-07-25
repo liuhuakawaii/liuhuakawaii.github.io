@@ -27,7 +27,7 @@ heroImageStyle: {
 }
 bgImage: back.gif
 bgImageStyle: {
-  height: '1000px'
+  height: '95vh'
 }
 
 isShowTitleInHome: false
@@ -40,11 +40,12 @@ features:
   details: 希望帮助更多的人花更多的时间在内容创作上，而不是博客搭建上
 - title: Tomorrow
   details: 希望更多的爱好者能够参与进来，帮助这个主题更好的成长
+
 ---
-<style>
+<!-- <style>
   body{
 
-  background-image: url('/liuhuakawaii.github.io/.vuepress/public/homeBack.gif');
+  background-image: url('homeBack.gif');
 
   }
 
@@ -92,7 +93,7 @@ features:
 }
 </style>
 
-<script>
+<script> -->
 export default {
   mounted () {
     const ifJanchor = document.getElementById("JanchorDown"); 
@@ -115,4 +116,3 @@ export default {
   }
 }
 </script>
-

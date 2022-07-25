@@ -102,9 +102,10 @@ module.exports = {
     //看板娘的配置
     [
       '@vuepress-reco/vuepress-plugin-kan-ban-niang',{
-        theme: [
-          'miku', 'whiteCat', 'haru1', 'haru2', 'haruto', 'koharu', 'izumi', 'shizuku', 'wanko', 'blackCat', 'z16'
-        ],
+        // theme: [
+        //   'miku', 'whiteCat', 'haru1', 'haru2', 'haruto', 'koharu', 'izumi', 'shizuku', 'wanko', 'blackCat', 'z16'
+        // ],
+        theme:['miku'],
         clean: false,
         messages: { 
           welcome: '欢迎来到我的博客', home: '心里的花，我想要带你回家。', theme: '好吧，希望你能喜欢我的其他小伙伴。', close: '你不喜欢我了吗？痴痴地望着你。' 
@@ -115,33 +116,33 @@ module.exports = {
       }
     ],
     //公告的配置
-    ['@vuepress-reco/vuepress-plugin-bulletin-popover', {
-      title: '公告',
-      body: [
-        {
-          type: 'title',
-          content: '欢迎来到我的主页 🎉🎉🎉',
-          style: 'text-aligin: center;',
-        },
-        {
-          type: 'text',
-          content: '喜欢的主题特效可以去个人信息',
-          style: 'text-align: center;'
-        },
-        {
-          type: 'text',
-          content: '友链或疑问均可在留言板给我留言',
-          style: 'text-align: center;'
-        }
-      ],
-      footer: [
-        {
-          type: 'button',
-          text: '打赏',
-          link: '/blog/donate'
-        },
-      ]
-    }],
+    // ['@vuepress-reco/vuepress-plugin-bulletin-popover', {
+    //   title: '公告',
+    //   body: [
+    //     {
+    //       type: 'title',
+    //       content: '欢迎来到我的主页 🎉🎉🎉',
+    //       style: 'text-aligin: center;',
+    //     },
+    //     {
+    //       type: 'text',
+    //       content: '喜欢的主题特效可以去个人信息',
+    //       style: 'text-align: center;'
+    //     },
+    //     {
+    //       type: 'text',
+    //       content: '友链或疑问均可在留言板给我留言',
+    //       style: 'text-align: center;'
+    //     }
+    //   ],
+    //   footer: [
+    //     {
+    //       type: 'button',
+    //       text: '打赏',
+    //       link: '/blog/donate'
+    //     },
+    //   ]
+    // }],
     //鼠标点击特效
     [
       "vuepress-plugin-cursor-effects",
