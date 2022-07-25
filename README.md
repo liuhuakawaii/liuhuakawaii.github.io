@@ -1,7 +1,7 @@
 ---
 home: true
-heroText: vuepress-theme-reco
-tagline: A simple and beautiful vuepress blog theme.
+heroText: 小董`s 个人主页
+tagline: love & peace
 # heroImage: /hero.png
 # heroImageStyle: {
 #   maxWidth: '600px',
