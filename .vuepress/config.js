@@ -7,7 +7,7 @@ module.exports = {
       "link",
       {
         "rel": "icon",
-        "href": "/favicon.ico"
+        "href": "/favicon.webp"
       }
     ],
     [
@@ -86,12 +86,12 @@ module.exports = {
         "link": "https://vuepress-theme-reco.recoluan.com"
       }
     ],
-    "logo": "/logo.png",
+    "logo": "/favicon.webp",
     "search": true,
     "searchMaxSuggestions": 10,
     "lastUpdated": "Last Updated",
     "author": "小董",
-    "authorAvatar": "/avatar.png",
+    "authorAvatar": "/favicon.webp",
     "record": "xxxx",
     "startYear": "2017"
   },
