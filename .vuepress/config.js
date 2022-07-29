@@ -22,32 +22,32 @@ module.exports = {
   "themeConfig": {
     "nav": [
       {
-        "text": "Home",
+        "text": "主页",
         "link": "/",
         "icon": "reco-home"
       },
       {
-        "text": "TimeLine",
+        "text": "时间轴",
         "link": "/timeline/",
         "icon": "reco-date"
       },
+      // {
+      //   "text": "Docs",
+      //   "icon": "reco-message",
+      //   "items": [
+      //     {
+      //       "text": "vuepress-reco",
+      //       "link": "/docs/theme-reco/"
+      //     }
+      //   ]
+      // },
       {
-        "text": "Docs",
-        "icon": "reco-message",
-        "items": [
-          {
-            "text": "vuepress-reco",
-            "link": "/docs/theme-reco/"
-          }
-        ]
-      },
-      {
-        "text": "Contact",
+        "text": "关于",
         "icon": "reco-message",
         "items": [
           {
             "text": "GitHub",
-            "link": "https://github.com/recoluan",
+            "link": "https://github.com/liuhuakawaii/",
             "icon": "reco-github"
           }
         ]
@@ -65,11 +65,11 @@ module.exports = {
     "blogConfig": {
       "category": {
         "location": 2,
-        "text": "Category"
+        "text": "分类"
       },
       "tag": {
         "location": 3,
-        "text": "Tag"
+        "text": "标签"
       }
     },
     "friendLink": [
