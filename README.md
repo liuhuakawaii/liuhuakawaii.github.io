@@ -1,7 +1,7 @@
 ---
 home: true
-heroText: 小董の个人主页
-tagline: love & peace
+heroText: 小董のBlog
+tagline: 日常记录--踩坑总结
 # 原来的配置内容
 # heroImage: /hero.png
 # heroImageStyle: {
