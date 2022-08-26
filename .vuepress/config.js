@@ -86,6 +86,11 @@ module.exports = {
         "link": "https://vuepress-theme-reco.recoluan.com"
       }
     ],
+    //评论功能
+    'valineConfig':{
+      'appId':'nUlPi08nx2bDWhzC3NV4z6O9-gzGzoHsz',
+      'appKey':'blG2kAujLWuXO0bxhYiOnxds',
+    },
     "logo": "/favicon.webp",
     "search": true,
     "searchMaxSuggestions": 10,
