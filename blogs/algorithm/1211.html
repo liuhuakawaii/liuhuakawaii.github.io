@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>数据结构---链表 | 小董的Blog</title>
+    <meta name="generator" content="VuePress 1.8.2">
+    <link rel="icon" href="/favicon.webp">
+    <meta name="description" content="my-blog">
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
+    
+    <link rel="preload" href="/assets/css/0.styles.2952188d.css" as="style"><link rel="preload" href="/assets/js/app.44e57090.js" as="script"><link rel="preload" href="/assets/js/4.181f235c.js" as="script"><link rel="preload" href="/assets/js/1.e6e6e62e.js" as="script"><link rel="preload" href="/assets/js/25.54c278a4.js" as="script"><link rel="prefetch" href="/assets/js/10.c8d85fba.js"><link rel="prefetch" href="/assets/js/100.29e5a701.js"><link rel="prefetch" href="/assets/js/101.4f40739d.js"><link rel="prefetch" href="/assets/js/102.f697a91e.js"><link rel="prefetch" href="/assets/js/103.2c979fa8.js"><link rel="prefetch" href="/assets/js/104.8a38bc4b.js"><link rel="prefetch" href="/assets/js/105.93d7875e.js"><link rel="prefetch" href="/assets/js/106.5c897974.js"><link rel="prefetch" href="/assets/js/107.9500c294.js"><link rel="prefetch" href="/assets/js/108.8332ad1a.js"><link rel="prefetch" href="/assets/js/109.d5e5789e.js"><link rel="prefetch" href="/assets/js/11.39d4a944.js"><link rel="prefetch" href="/assets/js/110.8c2654cb.js"><link rel="prefetch" href="/assets/js/111.f1612c23.js"><link rel="prefetch" href="/assets/js/112.94c2333b.js"><link rel="prefetch" href="/assets/js/113.7d661084.js"><link rel="prefetch" href="/assets/js/114.2b84bb3e.js"><link rel="prefetch" href="/assets/js/115.e5c0f91d.js"><link rel="prefetch" href="/assets/js/116.3b654025.js"><link rel="prefetch" href="/assets/js/117.1830d956.js"><link rel="prefetch" href="/assets/js/118.d4497ef9.js"><link rel="prefetch" href="/assets/js/119.69f684d8.js"><link rel="prefetch" href="/assets/js/12.5b9b3182.js"><link rel="prefetch" href="/assets/js/120.f8d967ec.js"><link rel="prefetch" href="/assets/js/121.6681920c.js"><link rel="prefetch" href="/assets/js/122.787f3e38.js"><link rel="prefetch" href="/assets/js/123.207842df.js"><link rel="prefetch" href="/assets/js/124.e6a16d6d.js"><link rel="prefetch" href="/assets/js/125.dc95c7f2.js"><link rel="prefetch" href="/assets/js/126.ef81e5b4.js"><link rel="prefetch" href="/assets/js/127.4b8507a4.js"><link rel="prefetch" href="/assets/js/128.289b0b3c.js"><link rel="prefetch" href="/assets/js/129.b367618a.js"><link rel="prefetch" href="/assets/js/13.4a127d99.js"><link rel="prefetch" href="/assets/js/130.e16fbbc2.js"><link rel="prefetch" href="/assets/js/131.21883156.js"><link rel="prefetch" href="/assets/js/132.75a93cf2.js"><link rel="prefetch" href="/assets/js/14.02dea18c.js"><link rel="prefetch" href="/assets/js/15.8a9d91ab.js"><link rel="prefetch" href="/assets/js/16.37449adb.js"><link rel="prefetch" href="/assets/js/17.32882eba.js"><link rel="prefetch" href="/assets/js/18.4c5df92e.js"><link rel="prefetch" href="/assets/js/19.d1504b81.js"><link rel="prefetch" href="/assets/js/20.2e07e79b.js"><link rel="prefetch" href="/assets/js/21.3b38edda.js"><link rel="prefetch" href="/assets/js/22.317eedd4.js"><link rel="prefetch" href="/assets/js/23.ee57cd26.js"><link rel="prefetch" href="/assets/js/24.ae236bbf.js"><link rel="prefetch" href="/assets/js/26.854f7b14.js"><link rel="prefetch" href="/assets/js/27.80f70d43.js"><link rel="prefetch" href="/assets/js/28.f313f88e.js"><link rel="prefetch" href="/assets/js/29.e344a089.js"><link rel="prefetch" href="/assets/js/3.3c13277f.js"><link rel="prefetch" href="/assets/js/30.7717fdc3.js"><link rel="prefetch" href="/assets/js/31.8a305c5f.js"><link rel="prefetch" href="/assets/js/32.6fa6351f.js"><link rel="prefetch" href="/assets/js/33.410948d6.js"><link rel="prefetch" href="/assets/js/34.3d77ee42.js"><link rel="prefetch" href="/assets/js/35.66e331d0.js"><link rel="prefetch" href="/assets/js/36.a4d89403.js"><link rel="prefetch" href="/assets/js/37.0149a18a.js"><link rel="prefetch" href="/assets/js/38.945d7a78.js"><link rel="prefetch" href="/assets/js/39.80d88a49.js"><link rel="prefetch" href="/assets/js/40.afb1308f.js"><link rel="prefetch" href="/assets/js/41.fcc700eb.js"><link rel="prefetch" href="/assets/js/42.a400cc97.js"><link rel="prefetch" href="/assets/js/43.16b60b18.js"><link rel="prefetch" href="/assets/js/44.f23e4bb2.js"><link rel="prefetch" href="/assets/js/45.4765e39c.js"><link rel="prefetch" href="/assets/js/46.6510bdc9.js"><link rel="prefetch" href="/assets/js/47.36346415.js"><link rel="prefetch" href="/assets/js/48.a2791c5b.js"><link rel="prefetch" href="/assets/js/49.f5a05df6.js"><link rel="prefetch" href="/assets/js/5.09b7ad81.js"><link rel="prefetch" href="/assets/js/50.021bf924.js"><link rel="prefetch" href="/assets/js/51.bc1a1272.js"><link rel="prefetch" href="/assets/js/52.43bf7ec1.js"><link rel="prefetch" href="/assets/js/53.97c3d3d9.js"><link rel="prefetch" href="/assets/js/54.ed004346.js"><link rel="prefetch" href="/assets/js/55.bda51b90.js"><link rel="prefetch" href="/assets/js/56.766faf3e.js"><link rel="prefetch" href="/assets/js/57.40800b12.js"><link rel="prefetch" href="/assets/js/58.8aef5cbc.js"><link rel="prefetch" href="/assets/js/59.d33422f8.js"><link rel="prefetch" href="/assets/js/6.30e5caff.js"><link rel="prefetch" href="/assets/js/60.a39d57ab.js"><link rel="prefetch" href="/assets/js/61.4c3b401d.js"><link rel="prefetch" href="/assets/js/62.01820346.js"><link rel="prefetch" href="/assets/js/63.312109f7.js"><link rel="prefetch" href="/assets/js/64.3bbce5e3.js"><link rel="prefetch" href="/assets/js/65.09ff035a.js"><link rel="prefetch" href="/assets/js/66.87db8b40.js"><link rel="prefetch" href="/assets/js/67.8ff57a43.js"><link rel="prefetch" href="/assets/js/68.8a9e739f.js"><link rel="prefetch" href="/assets/js/69.987e0b58.js"><link rel="prefetch" href="/assets/js/7.116d0637.js"><link rel="prefetch" href="/assets/js/70.2c5bdd94.js"><link rel="prefetch" href="/assets/js/71.410368c7.js"><link rel="prefetch" href="/assets/js/72.ef36877c.js"><link rel="prefetch" href="/assets/js/73.f17a9018.js"><link rel="prefetch" href="/assets/js/74.cc084c72.js"><link rel="prefetch" href="/assets/js/75.b3b9958d.js"><link rel="prefetch" href="/assets/js/76.b988e77c.js"><link rel="prefetch" href="/assets/js/77.b96e55be.js"><link rel="prefetch" href="/assets/js/78.b002af8a.js"><link rel="prefetch" href="/assets/js/79.680c4175.js"><link rel="prefetch" href="/assets/js/8.1df091c6.js"><link rel="prefetch" href="/assets/js/80.c7360bad.js"><link rel="prefetch" href="/assets/js/81.cce30482.js"><link rel="prefetch" href="/assets/js/82.ed183431.js"><link rel="prefetch" href="/assets/js/83.41848223.js"><link rel="prefetch" href="/assets/js/84.b5b180d0.js"><link rel="prefetch" href="/assets/js/85.a0e0d335.js"><link rel="prefetch" href="/assets/js/86.d2ce768b.js"><link rel="prefetch" href="/assets/js/87.3ae08535.js"><link rel="prefetch" href="/assets/js/88.c3d0e4d5.js"><link rel="prefetch" href="/assets/js/89.170dbc71.js"><link rel="prefetch" href="/assets/js/9.ed0384c2.js"><link rel="prefetch" href="/assets/js/90.e1324af3.js"><link rel="prefetch" href="/assets/js/91.960a8ead.js"><link rel="prefetch" href="/assets/js/92.aaf7cd2b.js"><link rel="prefetch" href="/assets/js/93.177ea42d.js"><link rel="prefetch" href="/assets/js/94.2b910bf0.js"><link rel="prefetch" href="/assets/js/95.09ef84f8.js"><link rel="prefetch" href="/assets/js/96.61c994d0.js"><link rel="prefetch" href="/assets/js/97.9031e223.js"><link rel="prefetch" href="/assets/js/98.3d99e80d.js"><link rel="prefetch" href="/assets/js/99.12cb9b83.js">
+    <link rel="stylesheet" href="/assets/css/0.styles.2952188d.css">
+  </head>
+  <body>
+    <div id="app" data-server-rendered="true"><div class="theme-container no-sidebar" data-v-6853d236><div data-v-6853d236><div class="password-shadow password-wrapper-out" style="display:none;" data-v-2d5d5590 data-v-6853d236 data-v-6853d236><h3 class="title" data-v-2d5d5590>小董的Blog</h3> <p class="description" data-v-2d5d5590>my-blog</p> <label id="box" class="inputBox" data-v-2d5d5590><input type="password" value="" data-v-2d5d5590> <span data-v-2d5d5590>Konck! Knock!</span> <button data-v-2d5d5590>OK</button></label> <div class="footer" data-v-2d5d5590><span data-v-2d5d5590><i class="iconfont reco-theme" data-v-2d5d5590></i> <a target="blank" href="https://vuepress-theme-reco.recoluan.com" data-v-2d5d5590>vuePress-theme-reco</a></span> <span data-v-2d5d5590><i class="iconfont reco-copyright" data-v-2d5d5590></i> <a data-v-2d5d5590><span data-v-2d5d5590>小董</span>
+          
+        <span data-v-2d5d5590>2017 - </span>
+        2023
+      </a></span></div></div> <div class="hide" data-v-6853d236><header class="navbar" data-v-6853d236><div class="sidebar-button"><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" role="img" viewBox="0 0 448 512" class="icon"><path fill="currentColor" d="M436 124H12c-6.627 0-12-5.373-12-12V80c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12zm0 160H12c-6.627 0-12-5.373-12-12v-32c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12zm0 160H12c-6.627 0-12-5.373-12-12v-32c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12z"></path></svg></div> <a href="/" class="home-link router-link-active"><img src="/favicon.webp" alt="小董的Blog" class="logo"> <span class="site-name">小董的Blog</span></a> <div class="links"><div class="color-picker"><a class="color-button"><i class="iconfont reco-color"></i></a> <div class="color-picker-menu" style="display:none;"><div class="mode-options"><h4 class="title">Choose mode</h4> <ul class="color-mode-options"><li class="dark">dark</li><li class="auto active">auto</li><li class="light">light</li></ul></div></div></div> <div class="search-box"><i class="iconfont reco-search"></i> <input aria-label="Search" autocomplete="off" spellcheck="false" value=""> <!----></div> <nav class="nav-links can-hide"><div class="nav-item"><a href="/" class="nav-link"><i class="iconfont reco-home"></i>
+  主页
+</a></div><div class="nav-item"><div class="dropdown-wrapper"><a class="dropdown-title"><span class="title"><i class="iconfont reco-category"></i>
+      分类
+    </span> <span class="arrow right"></span></a> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/categories/算法/" class="nav-link"><i class="undefined"></i>
+  算法
+</a></li><li class="dropdown-item"><!----> <a href="/categories/工具类/" class="nav-link"><i class="undefined"></i>
+  工具类
+</a></li><li class="dropdown-item"><!----> <a href="/categories/神奇的API/" class="nav-link"><i class="undefined"></i>
+  神奇的API
+</a></li><li class="dropdown-item"><!----> <a href="/categories/css小知识/" class="nav-link"><i class="undefined"></i>
+  css小知识
+</a></li><li class="dropdown-item"><!----> <a href="/categories/css-demo/" class="nav-link"><i class="undefined"></i>
+  css-demo
+</a></li><li class="dropdown-item"><!----> <a href="/categories/js小知识/" class="nav-link"><i class="undefined"></i>
+  js小知识
+</a></li><li class="dropdown-item"><!----> <a href="/categories/es6/" class="nav-link"><i class="undefined"></i>
+  es6
+</a></li><li class="dropdown-item"><!----> <a href="/categories/面试细节/" class="nav-link"><i class="undefined"></i>
+  面试细节
+</a></li><li class="dropdown-item"><!----> <a href="/categories/笔记/" class="nav-link"><i class="undefined"></i>
+  笔记
+</a></li><li class="dropdown-item"><!----> <a href="/categories/踩坑/" class="nav-link"><i class="undefined"></i>
+  踩坑
+</a></li></ul></div></div><div class="nav-item"><a href="/tag/" class="nav-link"><i class="iconfont reco-tag"></i>
+  标签
+</a></div><div class="nav-item"><a href="/timeline/" class="nav-link"><i class="iconfont reco-date"></i>
+  时间轴
+</a></div><div class="nav-item"><div class="dropdown-wrapper"><a class="dropdown-title"><span class="title"><i class="iconfont reco-message"></i>
+      关于
+    </span> <span class="arrow right"></span></a> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="https://github.com/liuhuakawaii/" target="_blank" rel="noopener noreferrer" class="nav-link external"><i class="iconfont reco-github"></i>
+  GitHub
+  <span><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg> <span class="sr-only">(opens new window)</span></span></a></li></ul></div></div> <!----></nav></div></header> <div class="sidebar-mask" data-v-6853d236></div> <aside class="sidebar" data-v-6853d236><div class="personal-info-wrapper" data-v-3c280276 data-v-6853d236><img src="/favicon.webp" alt="author-avatar" class="personal-img" data-v-3c280276> <h3 class="name" data-v-3c280276>
+    小董
+  </h3> <div class="num" data-v-3c280276><div data-v-3c280276><h3 data-v-3c280276>122</h3> <h6 data-v-3c280276>Articles</h6></div> <div data-v-3c280276><h3 data-v-3c280276>21</h3> <h6 data-v-3c280276>Tags</h6></div></div> <ul class="social-links" data-v-3c280276></ul> <hr data-v-3c280276></div> <nav class="nav-links"><div class="nav-item"><a href="/" class="nav-link"><i class="iconfont reco-home"></i>
+  主页
+</a></div><div class="nav-item"><div class="dropdown-wrapper"><a class="dropdown-title"><span class="title"><i class="iconfont reco-category"></i>
+      分类
+    </span> <span class="arrow right"></span></a> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/categories/算法/" class="nav-link"><i class="undefined"></i>
+  算法
+</a></li><li class="dropdown-item"><!----> <a href="/categories/工具类/" class="nav-link"><i class="undefined"></i>
+  工具类
+</a></li><li class="dropdown-item"><!----> <a href="/categories/神奇的API/" class="nav-link"><i class="undefined"></i>
+  神奇的API
+</a></li><li class="dropdown-item"><!----> <a href="/categories/css小知识/" class="nav-link"><i class="undefined"></i>
+  css小知识
+</a></li><li class="dropdown-item"><!----> <a href="/categories/css-demo/" class="nav-link"><i class="undefined"></i>
+  css-demo
+</a></li><li class="dropdown-item"><!----> <a href="/categories/js小知识/" class="nav-link"><i class="undefined"></i>
+  js小知识
+</a></li><li class="dropdown-item"><!----> <a href="/categories/es6/" class="nav-link"><i class="undefined"></i>
+  es6
+</a></li><li class="dropdown-item"><!----> <a href="/categories/面试细节/" class="nav-link"><i class="undefined"></i>
+  面试细节
+</a></li><li class="dropdown-item"><!----> <a href="/categories/笔记/" class="nav-link"><i class="undefined"></i>
+  笔记
+</a></li><li class="dropdown-item"><!----> <a href="/categories/踩坑/" class="nav-link"><i class="undefined"></i>
+  踩坑
+</a></li></ul></div></div><div class="nav-item"><a href="/tag/" class="nav-link"><i class="iconfont reco-tag"></i>
+  标签
+</a></div><div class="nav-item"><a href="/timeline/" class="nav-link"><i class="iconfont reco-date"></i>
+  时间轴
+</a></div><div class="nav-item"><div class="dropdown-wrapper"><a class="dropdown-title"><span class="title"><i class="iconfont reco-message"></i>
+      关于
+    </span> <span class="arrow right"></span></a> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="https://github.com/liuhuakawaii/" target="_blank" rel="noopener noreferrer" class="nav-link external"><i class="iconfont reco-github"></i>
+  GitHub
+  <span><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg> <span class="sr-only">(opens new window)</span></span></a></li></ul></div></div> <!----></nav> <!----> </aside> <div class="password-shadow password-wrapper-in" style="display:none;" data-v-2d5d5590 data-v-6853d236><h3 class="title" data-v-2d5d5590>数据结构---链表</h3> <!----> <label id="box" class="inputBox" data-v-2d5d5590><input type="password" value="" data-v-2d5d5590> <span data-v-2d5d5590>Konck! Knock!</span> <button data-v-2d5d5590>OK</button></label> <div class="footer" data-v-2d5d5590><span data-v-2d5d5590><i class="iconfont reco-theme" data-v-2d5d5590></i> <a target="blank" href="https://vuepress-theme-reco.recoluan.com" data-v-2d5d5590>vuePress-theme-reco</a></span> <span data-v-2d5d5590><i class="iconfont reco-copyright" data-v-2d5d5590></i> <a data-v-2d5d5590><span data-v-2d5d5590>小董</span>
+          
+        <span data-v-2d5d5590>2017 - </span>
+        2023
+      </a></span></div></div> <div data-v-6853d236><div data-v-6853d236><main class="page" style="padding-right:0;"><section style="display:;"><div class="page-title"><h1 class="title">数据结构---链表</h1> <div data-v-305db890><i class="iconfont reco-account" data-v-305db890><span data-v-305db890>小董</span></i> <i class="iconfont reco-date" data-v-305db890><span data-v-305db890>12/11/2022</span></i> <i class="iconfont reco-eye" data-v-305db890><span id="/blogs/algorithm/1211.html" data-flag-title="Your Article Title" class="leancloud-visitors" data-v-305db890><a class="leancloud-visitors-count" style="font-size:.9rem;font-weight:normal;color:#999;"></a></span></i> <i class="tags iconfont reco-tag" data-v-305db890><span class="tag-item" data-v-305db890>js</span></i></div></div> <div class="theme-reco-content content__default"><h2 id="数据结构-链表"><a href="#数据结构-链表" class="header-anchor">#</a> 数据结构---链表</h2> <h3 id="链表与数组的对比"><a href="#链表与数组的对比" class="header-anchor">#</a> 链表与数组的对比</h3> <ol><li>数组</li></ol> <ul><li>最常用的存储多个元素的数据结构</li> <li>缺点：
+<ol><li>数组的创建通常需要申请<strong>一段连续的内存空间</strong>（一整块内存），并且大小是固定的，所以当当前数组<strong>不能满足容量需求</strong>时，需要<strong>扩容</strong>，（一般情况下是申请一个更大的数组，比如两倍，然后将原数组中的元素复制过去）</li> <li>而且在数组开头或者中间位置插入数据的成本很高，需要进行大量元素的位移</li> <li>尽管我们已经学过的js的Array类方法可以帮我们做这些事，但背后的原理依然是这样</li></ol></li></ul> <ol start="2"><li>链表
+<ul><li>要存储多个元素，另外一个选择就是链表</li> <li>但不同于数组，链表中的元素在内存中<strong>不必是连续的空间</strong></li> <li>链表的每一个元素由一个存储<strong>元素本身的节点</strong>和一个<strong>指向下一个元素的引用</strong>（指针）组成</li> <li>优点：
+<ol><li>内存空间不是必须连续的，可以充分利用计算机的内存，实现灵活的<strong>内存动态管理</strong></li> <li>链表不必再创建时就<strong>确定大小</strong>，并且大小可以<strong>无限的延伸</strong>下去</li> <li>链表在<strong>插入和删除</strong>数据时，<strong>时间复杂度</strong>可以达到O（1），相对数组效率高很多，只需要改变指针指向</li></ol></li> <li>缺点：
+<ol><li>链表访问任何一个位置的元素时，都需要<strong>从头开始访问</strong>。（无法跳过第一个元素访问任何一个元素）</li> <li>无法通过下标直接访问，需要一个个从头访问</li></ol></li></ul></li></ol> <h3 id="什么是链表"><a href="#什么是链表" class="header-anchor">#</a> 什么是链表</h3> <ul><li><p>链表类似于火车：有一个火车头，火车头会链接一个节点，节点上有乘客（类似于数据），并且这个节点会链接下一个节点<br> <img src="/assets/img/121102.1e54c76a.png" alt=""><br> <img src="/assets/img/121101.a781799a.png" alt=""></p></li> <li><p>单向链表的封装
+```js<br>
+//封装链表类
+function LinkedList(){
+//  内部的类：节点类<br>
+function Node(data,next = null){
+this.data = data
+}
+//属性<br>
+this.head = null //头指针
+this.length = 0</p> <div class="language- extra-class"><pre><code>        //1.追加方法    
+        LinkedList.prototype.append = function(data){
+          //1.创建新节点
+          let newNode = new Node(data)
+          //2.判断是否添加的是第一个节点
+          if(this.length === 0){//2.1是第一个节点
+            this.head = newNode
+          }else{//2.2不是第一个节点  
+            let current = this.head
+            while(current.next){
+              //找到最后一个节点
+              current = current.next 
+            }
+            //最后节点的next指向新的节点
+            current.next = newNode
+          }
+          //3.length+1
+          this.length += 1
+        }   
+
+        //2.toString方法
+        LinkedList.prototype.toString = function(){
+          //1.定义变量
+          let current = this.head
+          let listString = ''
+          //2.循环获取一个个的节点
+          while(current){
+            listString += current.data + ' '
+            current = current.next
+          }
+          return listString
+        }   
+
+        //3.insert方法的实现    
+        LinkedList.prototype.insert = function(position,data){
+          //1.对position进行越界判断
+          if(position &lt; 0 || position &gt; this.length) return false
+          //2.创建节点           
+          let newNode = new Node(data)   
+          let current = this.head
+          if(position == 0){
+            //如果加到头结点位置  
+            newNode.next = this.head
+            this.head = newNode
+          }else{//其他位置position -1 的next指向自己。自己的next指向原来的position
+            let index = 0
+            let previous = null
+            while(index++ &lt; position){
+              previous = current
+              current = current.next
+            }
+            newNode.next = current
+            previous.next = newNode
+          }
+          this.length += 1
+          return true
+        }     
+
+        //4. get方法    
+        LinkedList.prototype.get = function(position){
+          //1.对position进行越界判断
+          if(position &lt; 0 || position &gt;= this.length) return null  
+          //2. 获取对应的data    
+          let current = this.head
+          let index = 0
+          while(index++ &lt; position){
+              current = current.next
+          }
+          return current.data
+        }   
+
+        //5.  indexOf方法
+        LinkedList.prototype.indexOf = function(data){
+          let current = this.head
+          let index = 0
+          while(current){
+            if(data == current.data) return index
+            current = current.next
+            index++
+          }
+          return -1
+        } 
+
+        //6. update(position,ele)方法   update(2,aaa)
+        LinkedList.prototype.update = function(position,data){
+            //1.对position进行越界判断
+          if(position &lt; 0 || position &gt;= this.length) return false 
+          let current = this.head
+          let index = 0
+          while(index++ &lt; position){//还没有找到position位置
+            current = current.next
+          }
+          current.data = data
+          return true
+        }     
+
+        //7.removeAt方法  
+        LinkedList.prototype.removeAt = function(position){
+            //1.对position进行越界判断
+          if(position &lt; 0 || position &gt;= this.length) return false 
+          let current = this.head
+          let index = 0
+          let previous = null
+          if(position == 0){
+            this.head = current.next
+          }else{
+            while(index++ &lt; position){//还没有找到position位置
+              previous =current
+              current = current.next
+            }
+            previous.next = current.next
+          }
+          this.length--
+          return true
+        } 
+        
+        //8. remove方法       
+        LinkedList.prototype.remove = function(data){
+          let position = this.indexOf(data)
+          return this.removeAt(position)
+        } 
+        //9.isEmpty()
+        LinkedList.prototype.isEmpty = function(){
+          return this.length === 0
+        }  
+        //10.size()
+        LinkedList.prototype.size = function(){
+          return this.length
+        } 
+      }
+    let list = new LinkedList()   
+```</code></pre></div></li></ul></div></section> <footer class="page-edit"><!----> <div class="last-updated"><span class="prefix">Last Updated: </span> <span class="time">4/10/2023, 9:33:43 PM</span></div></footer> <!----> <div class="comments-wrapper"><!----></div> <ul class="side-bar sub-sidebar-wrapper" style="width:0;" data-v-070bf1cb></ul></main></div> <!----></div></div></div></div><div class="global-ui"><div class="back-to-ceiling" style="right:1rem;bottom:6rem;width:2.5rem;height:2.5rem;border-radius:.25rem;line-height:2.5rem;display:none;" data-v-65133105 data-v-65133105><svg t="1574745035067" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="5404" class="icon" data-v-65133105><path d="M526.60727968 10.90185116a27.675 27.675 0 0 0-29.21455937 0c-131.36607665 82.28402758-218.69155461 228.01873535-218.69155402 394.07834331a462.20625001 462.20625001 0 0 0 5.36959153 69.94390903c1.00431239 6.55289093-0.34802892 13.13561351-3.76865779 18.80351572-32.63518765 54.11355614-51.75690182 118.55860487-51.7569018 187.94566865a371.06718723 371.06718723 0 0 0 11.50484808 91.98906777c6.53300375 25.50556257 41.68394495 28.14064038 52.69160883 4.22606766 17.37162448-37.73630017 42.14135425-72.50938081 72.80769204-103.21549295 2.18761121 3.04276886 4.15646224 6.24463696 6.40373557 9.22774369a1871.4375 1871.4375 0 0 0 140.04691725 5.34970492 1866.36093723 1866.36093723 0 0 0 140.04691723-5.34970492c2.24727335-2.98310674 4.21612437-6.18497483 6.3937923-9.2178004 30.66633723 30.70611158 55.4360664 65.4791928 72.80769147 103.21549355 11.00766384 23.91457269 46.15860503 21.27949489 52.69160879-4.22606768a371.15156223 371.15156223 0 0 0 11.514792-91.99901164c0-69.36717486-19.13165746-133.82216804-51.75690182-187.92578088-3.42062944-5.66790279-4.76302748-12.26056868-3.76865837-18.80351632a462.20625001 462.20625001 0 0 0 5.36959269-69.943909c-0.00994388-166.08943902-87.32547796-311.81420293-218.6915546-394.09823051zM605.93803103 357.87693858a93.93749974 93.93749974 0 1 1-187.89594924 6.1e-7 93.93749974 93.93749974 0 0 1 187.89594924-6.1e-7z" p-id="5405" data-v-65133105></path><path d="M429.50777625 765.63860547C429.50777625 803.39355007 466.44236686 1000.39046097 512.00932183 1000.39046097c45.56695499 0 82.4922232-197.00623328 82.5015456-234.7518555 0-37.75494459-36.9345906-68.35043303-82.4922232-68.34111062-45.57627738-0.00932239-82.52019037 30.59548842-82.51086798 68.34111062z" p-id="5406" data-v-65133105></path></svg></div><div class="kanbanniang" data-v-ee8d62e6><div class="banniang-container" style="display:;" data-v-ee8d62e6><div class="messageBox" style="right:68px;bottom:290px;display:none;" data-v-ee8d62e6>
+      欢迎来到我的博客
+    </div> <div class="operation" style="right:90px;bottom:40px;display:;" data-v-ee8d62e6><i class="kbnfont kbn-ban-home ban-home" data-v-ee8d62e6></i> <i class="kbnfont kbn-ban-message message" data-v-ee8d62e6></i> <i class="kbnfont kbn-ban-close close" data-v-ee8d62e6></i> <a target="_blank" href="https://vuepress-theme-reco.recoluan.com/views/plugins/kanbanniang.html" data-v-ee8d62e6><i class="kbnfont kbn-ban-info info" data-v-ee8d62e6></i></a> <i class="kbnfont kbn-ban-theme skin" style="display:;" data-v-ee8d62e6></i></div> <canvas id="banniang" width="250" height="320" class="live2d" style="right:90px;bottom:-20px;opacity:0.9;" data-v-ee8d62e6></canvas></div> <div class="showBanNiang" style="display:none;" data-v-ee8d62e6>
+    看板娘
+  </div></div><canvas id="vuepress-canvas-cursor"></canvas><!----><div class="RibbonAnimation"></div></div></div>
+    <script src="/assets/js/app.44e57090.js" defer></script><script src="/assets/js/4.181f235c.js" defer></script><script src="/assets/js/1.e6e6e62e.js" defer></script><script src="/assets/js/25.54c278a4.js" defer></script>
+  </body>
+</html>
