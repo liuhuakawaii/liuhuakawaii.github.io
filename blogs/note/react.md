@@ -104,9 +104,7 @@ categories:
             1. 需求一：基于数据的值，来判断元素的显示隐藏         
                   ```jsx
                         {/* 控制元素的display样式，元素渲染出来了 */}
-                        <button style={{
-                        display:flag?'block':'none'
-                        }}>按钮1</button>
+                        <button style={{display:flag?'block':'none'}}>按钮1</button>
 
                         {/* 控制元素渲染或者不渲染 */}
                         {!flag ? <button>按钮2</button> :null}
@@ -117,12 +115,13 @@ categories:
                         <ul className='news-box'>
                         {list.stories.map((item,index)=>{
                         /*循环创建的元素设置key属性，优DOM-diff*/ 
-                        return   <li key={item.id}>
-                              <em>{index + 1}</em>
-                              &nbsp;&nbsp;
-                        <span>欢迎大家学习{item.title}</span>
-                        </li>
-                        })}
+                              return   (
+                                    <li key={item.id}>
+                                    <em>{index + 1}</em>
+                                    &nbsp;&nbsp;
+                                    <span>欢迎大家学习{item.title}</span>
+                                    </li>
+                              )})}
                         </ul>
                   ```         
             3. 扩展需求：没有数组，就想单独循环五次         
@@ -164,19 +163,16 @@ categories:
                   }
             ```
       3. 把构建的虚拟DOM渲染为真实DOM（基于`ReactDOM`中的`render`方法）       
-            + v16
+            + v16 **该写法现在会有控制台警告**
               ```jsx 
-                        ReactDOM.render(
-                              <>...</>,
-                              document.getElementById('root')
-                        )
+                        import ReactDOM from 'react-dom'; 
+                        ReactDOM.render(<App/>, document.getElementById('root'))
               ```
             + v18
               ```jsx 
+                        import ReactDOM from 'react-dom/client';
                         const root = ReactDOM.createRoot(document.getElementById('root'))
-                        root.render(
-                              <>...</>,
-                        )
+                        root.render(<App/>)
               ```
       4. 第一次渲染页面是直接从Vdom-->真实dom，并且把`oldVdom`缓存起来，后期视图更新的时候，需要经过一个新老Vdom的 `dom--diff`的对比，计算出补丁包`Patch`（两次视图差异的部分），把patch补丁包进行渲染      
 
@@ -201,10 +197,12 @@ categories:
                   import PropTypes from 'prop-types'
                   const DemoOne = function Demo(props){
                         let {className,style,title} = props
-                        return <div className={`demo-box ${className}`} style={style}>
-                              我是DEMO-ONE
-                              <div>{title}</div>
-                        </div>
+                        return (
+                              <div className={`demo-box ${className}`} style={style}>
+                                    我是DEMO-ONE
+                                    <div>{title}</div>
+                              </div>
+                        )
                   }
                   DemoOne.defaultProps = {//把函数当做对象，设置静态的私有属性方法，来设置校验规则
                         title:'默认值'
@@ -225,11 +223,9 @@ categories:
       2. 传递数据用属性，传递结构用插槽，通过子节点用`children`来获取
             ```jsx
                   //父组件
-                  <DemoOne className='demo1'  style={{
-                        color:'red'
-                        }} >
+                  <DemoOne className='demo1'  style={{color:'red'}}>
                         <span  slot='footer'>我是尾部2</span>
-                        <span  >我是moren</span>
+                        <span>我是moren</span>
                         <span slot='header'>我是头部</span>
                         <span  slot='footer'>我是尾部1</span>
                   </DemoOne>
@@ -257,10 +253,10 @@ categories:
                               }
                         })
                         return <div className='demo-box' >
-                              {headerSlot}
-                              <div>我是DEMO-ONE</div>
-                              {footerSlot}
-                              {defaultSlot}
+                                    {headerSlot}
+                                    <div>我是DEMO-ONE</div>
+                                    {footerSlot}
+                                    {defaultSlot}
                               </div>
                   }
             ```
@@ -352,53 +348,53 @@ categories:
             ```
      
       2. class基本语法回顾          
-            ```js       
-                  class Parent {
-                        //new的时候，执行的构造函数（需要接收传递进来的实参信息，才需要设置constructor）
-                        constructor (x,y){
-                              //this --> 创建的实例
-                              this.total = x+y
-                        }
-                        // = 赋值--> 相当于this.num = 200-->创建的实例
-                        num = 200
-                        //箭头函数没有自己的this，所用到的this是宿主环境中的
-                        getNum = ()=>{  
-                              console.log(this.num);//this-->实例
-                        }
-                        //给Parent.prototype设置的公共方法，不可枚举
-                        getNum2 (){
-                              console.log(this,'原型');
-                        }
-                        //把构造函数当做一个普通对象，为其设置静态的私有属性方法 Parent.xxx
-                        static avg = 100  
-                        static average(){}
+      ```js       
+            class Parent {
+                  //new的时候，执行的构造函数（需要接收传递进来的实参信息，才需要设置constructor）
+                  constructor (x,y){
+                        //this --> 创建的实例
+                        this.total = x+y
                   }
-                  Parent.prototype.y = 200 //外部手动给原型上设置公共属性
-
-                  /*基于extends实现继承  
-                  1. 首先基于call继承 React.Component.call(this)  -->  this-->Parent类的实例P 
-
-                  2.给创建的实例p设置四个私有属性  
-
-                  3. 再基于原型继承 Parent.prototype.__proto__ === React.Component.prototype
-                  实例-->Parent.prototype-->React.Component.prototype-->Object.prototype
-                  继承forceUpdate isReactComponent setState方法
-
-                  4.只要自己设置了constructor，则内部第一句话一定要执行super() 
-                  */ 
-                  class Parent extends React.Component{
-                        constructor(n,m){
-                              super() //等价于React.component.call()
-                        }
-                  } 
-                    
-                  function Component(props,context,updater){
-                        this.props = props
-                        this.context = context
-                        this.refs = emptyObject
-                        this.updater = updater || ReactNoopUpdateQueue
+                  // = 赋值--> 相当于this.num = 200-->创建的实例
+                  num = 200
+                  //箭头函数没有自己的this，所用到的this是宿主环境中的
+                  getNum = ()=>{  
+                        console.log(this.num);//this-->实例
                   }
-            ```
+                  //给Parent.prototype设置的公共方法，不可枚举
+                  getNum2 (){
+                        console.log(this,'原型');
+                  }
+                  //把构造函数当做一个普通对象，为其设置静态的私有属性方法 Parent.xxx
+                  static avg = 100  
+                  static average(){}
+            }
+            Parent.prototype.y = 200 //外部手动给原型上设置公共属性
+
+            /*基于extends实现继承  
+            1. 首先基于call继承 React.Component.call(this)  -->  this-->Parent类的实例P 
+
+            2.给创建的实例p设置四个私有属性  
+
+            3. 再基于原型继承 Parent.prototype.__proto__ === React.Component.prototype
+            实例-->Parent.prototype-->React.Component.prototype-->Object.prototype
+            继承forceUpdate isReactComponent setState方法
+
+            4.只要自己设置了constructor，则内部第一句话一定要执行super() 
+            */ 
+            class Parent extends React.Component{
+                  constructor(n,m){
+                        super() //等价于React.component.call()
+                  }
+            } 
+            
+            function Component(props,context,updater){
+                  this.props = props
+                  this.context = context
+                  this.refs = emptyObject
+                  this.updater = updater || ReactNoopUpdateQueue
+            }
+      ```
       
       3. render函数在渲染的时候，如果type是：
             + 字符串：创建一个标签
@@ -492,43 +488,116 @@ categories:
                         console.log('componentWillReceiveProps,父组件修改特殊周期', this.props, nextProps)
                   }
             ```
-      
+            ![](./reactpic/04.png)
       6. `PureComponent`和`Component`的区别
             + `PureComponent`会给类组件默认添加`shouldComponentUpdate`周期函数
                   1. 在此周期函数中，他对新老的属性进行浅比较     
                   2. 如果比较后发现属性和状态没有变，则返回false，也就不执行后续生命周期了      
             
       7. ref  
-            + 受控组件：基于修改数据/状态，让视图更新，达到需要的效果
-            + 非受控组件：基于ref获取dom元素，操作dom来实现需求
-            + 基于ref获取DOM的语法        
-                  1. 元素设置`ref='xxx'`,通过`this.refs.xxx`来获取            
-                  2. 把ref属性设置为一个函数`ref =（x=>this.xxx = x）`，直接通过`this.xxx`来获取（推荐）
-                  3. 基于`xxx = React.createRef()`创建一个对象-->`{current:null}`,设置`ref = {xxx}`,通过`this.xxx.current`来获取
-            + 给元素标签设置ref获取对应的dom元素
-            + **给类组件设置ref，获取的是当前组件的实例**
-            + 给函数组件直接设置ref会报错，但是我们让其配合`React.forwardRef`实现ref的转发，可以获取函数子组件内部的某个元素
-                ```js
-                     const Child = React.forwardRef(function(props,ref){
-                        return <button ref={ref}></button>
-                     })
-                     //父组件
-                     render(){
-                        return <Child ref={x=>this.child = x}></Child>
-                     }
-                     console.log(this.child)
-                ```
+            + 应用场景：
+                  1. 管理焦点，文本选择或媒体播放。
+                  2. 触发强制动画。
+                  3. 集成第三方 DOM 库。
+            + 基于ref获取DOM的语法（**给类组件设置ref，获取的是当前组件的实例**）        
+                  1. string ref(废弃) : 元素设置`ref='xxx'`,通过`this.refs.xxx`来获取            
+                  2. callback ref : 把ref属性设置为一个函数`ref =（x=>this.xxx = x）`，直接通过`this.xxx`来获取（推荐）
+                  3. React.createRef() : 基于`xxx = React.createRef()`创建一个对象-->`{current:null}`,设置`ref = {xxx}`,通过`this.xxx.current`来获取
+                  ```js
+                        class Parent extends React.Component{
+                              constructor(props){
+                                    super(props) 
+                                    this.ref1 = React.createRef()  //{current:null}
+                              }
+                              componentDidMount(){
+                                    console.log(this.ref1)  //React.createRef() --> {current:div}
+                                    console.log(this.refs.ref2)  //string ref(废弃)
+                                    console.log(this.ref3) //callback ref  这个也可以用作父组件拿子组件的ref
+                              }
+                              render(){
+                                    return <div>
+                                          <div ref={this.ref1}></div>
+                                          <div ref='ref2'></div>   
+                                          <div ref={ele=>this.ref3 = ele}></div>
+                                    </div>
+                              }
+                        
+                        }  
+                  ```
+            + **以上三种使用ref方式不能在函数组件上使用，因为函数组件没有实例**
+                  1. 可以将该组件转化为 class 组件
+                  2. 可以使用 `React.forwardRef`实现ref的转发（可与 `useImperativeHandle` 结合使用）
+                  3. 在函数组件 使用useRef
+                        ```js
+                              const Child = React.forwardRef((props,ref)=>{
+                                    return <button ref={ref}></button>
+                              })
+                              //父组件
+                              render(){
+                                    return <Child ref={x=>this.child = x}></Child>
+                              }///    
+                              console.log(this.child)
+                        ```
+            + 在HOC中转发ref
+                  + 这个技巧对高阶组件（HOC）特别有用（接受一个组件，返回一个组件的函数）
+                  ```js
+                        function logProps(WrapperdComponent){
+                              class LogProps extends React.Component{
+                                    componentDidUpdate(prevProps){
+
+                                    }
+                                    render(){
+                                          return <WrapperdComponent {...this.props}/>
+                                    }
+                              }
+                              return LogProps
+                        }
+
+                        function logProps(WrapperdComponent){
+                              class LogProps extends React.Component{
+                                    componentDidUpdate(prevProps){
+
+                                    }
+                                    render(){
+                                          const {forwardedRef , ...rest} = this.props
+                                          return <WrapperdComponent ref={forwardedRef} {...rest}/>
+                                    }
+                              }
+                              return React.forwardRef((props,ref)=>{
+                                    return <LogProps {...props} forwardedRef={ref}/>
+                              })
+                        }
+                  ```
 
 ### setState进阶        
-1. **语法分析**       
-      ```js
-            this.setState(partialState,callback)
-            partialState:支持部分状态更改
-            callback:在状态更改/视图更新完毕（componentDidUpdate）后触发执行，如果shouldComponentUpdate拦截更新，componentDidUpdate不会执行，但是callback依旧会执行！！！
-            类似于$nextTick
-      ```
+1. **语法分析**   `setState(obj,callback)`    
+      * 第一个参数：当 obj 为一个对象，则为即将合并的 state ；如果 obj 是一个函数，那么当前组件的 state 和 props 将作为参数，返回值用于合并新的 state。
 
-2. **异步更新**       
+      * 第二个参数 callback ：callback 为一个函数，函数执行上下文中可以获取当前 setState 更新后的最新 state 的值，可以作为依赖 state 变化的副作用函数，可以用来做一些基于 DOM 的操作。
+
+      ```js
+            /* 第一个参数为function类型 */
+            this.setState((state,props)=>{
+                  return { number:1 } 
+            })
+            /* 第一个参数为object类型 */
+            this.setState({ number:1 },()=>{
+                  console.log(this.state.number) //获取最新的number
+            })
+      ```
+2. **一次setState在 React 底层主要做了那些事**
+* 首先，setState 会产生当前更新的优先级（老版本用 expirationTime ，新版本用 lane ）。
+* 接下来 React 会从 fiber Root 根部 fiber 向下调和子节点，调和阶段将对比发生更新的地方，更新对比 expirationTime ，找到发生更新的组件，合并 state，然后触发 render 函数，得到新的 UI 视图层，完成 render 阶段。
+* 接下来到 commit 阶段，commit 阶段，替换真实 DOM ，完成此次更新流程。
+* 此时仍然在 commit 阶段，会执行 setState 中 callback 函数,如上的`()=>{ console.log(this.state.number)  }`，到此为止完成了一次 setState 全过程。
+
+3. **类组件如何限制 state 更新视图**
+* ① pureComponent 可以对 state 和 props 进行浅比较，如果没有发生变化，那么组件不更新。
+* ② shouldComponentUpdate 生命周期可以通过判断前后 state 变化来决定组件需不需要更新，需要更新返回true，否则返回false。
+* ③ componentDidUpdate不会执行，但是callback依旧会执行！！！类似于$nextTick
+
+
+4. **异步更新**       
       + 在`React18`中，产生的私有上下文中，遇到`setState`,不会立即更新状态和视图，而是加入到更新队列`updaterQueue`中。
       + 当上下文中代码都处理完毕后，会让更新队列中的任务，统一渲染/更新一次（批处理）
       + 能够有效减少更新次数，降低性能消耗，有效管理代码执行的逻辑顺序
@@ -536,7 +605,7 @@ categories:
             + **在`React18`中，不论什么地方，都是异步的，基于`updaterQueue`处理机制实现批处理**           
             + **在`React16`中，在合成事件（On绑定事件），周期函数中，`setState`是异步的，但是如果`setState`出现在其他异步操作中，比如定时器，手动获取DOM元素做的事件绑定，它将变为同步的操作（立即更新状态和视图渲染）**
 
-3. **flushSync**
+5. **flushSync**
       + `react-dom`中有个`flushSync`方法，可以刷新`updaterQueue`，也就是让修改状态的任务立即批处理一次
            ```js
                   //写法一 先渲染xy 在渲染z
@@ -561,7 +630,7 @@ categories:
                    this.setState({z:z+1})
            ```
 
-4. **<font color='red'>短时间内多次修改state的同一值的问题</font>**
+6. **<font color='red'>短时间内多次修改state的同一值的问题</font>**
       ```js
             /*
                   在每一轮循环的时候，x状态没有更新，只是****把修改的任务结果放在了队列中****
@@ -590,29 +659,43 @@ categories:
 
 2. 合成事件this指向问题
       ```js
-         class Demo extends React.Component {
-            handle1 = (e) => {//方法在实例上
-               console.log(this,e)  //Demo实例 合成事件对象
-            }
-            //基于React内部的处理，如果给合成事件绑定的是一个普通函数，当事件行为触发，this指向会是undefined
-            handle2 (e) { //方法在原型上
+            class App extends React.Component {
+              constructor(props) {
+                super(props)
+                this.state = {
+                  count: 'old'
+                }
+                this.handlerClick = this.handlerClick.bind(this)   //配合方案1使用
+              }
+             handle1 (e) { //方法在原型上
                console.log(this) //undefined
+             }
+              handlerClick(x,e) {
+                console.log(this);
+                this.setState({ count: 'new' })
+                console.log(x,this,e)//10,Demo实例   //经过bind处理，name最后一个实参就是传递的合成事件对象
+              }
+              handlerClick4 = () => {  //Public class fields  //方法在实例上
+                console.log(this);
+                this.setState({ count: 'new' })
+              }
+
+              render() {
+                const { count } = this.state
+                console.log('App---');
+                return  <>
+                    {count}
+                    {/* 1.配合bind使用，否则this-->undefined */}
+                    <div onClick={this.handle1}>click1</div>
+                    {/* 2.有性能问题，每次re-render会产生新的函数 */}
+                    <div onClick={() => this.handlerClick()}>click2</div>
+                    {/* 3.和方案1类似 */}
+                    <div onClick={this.handlerClick.bind(this)}>click3</div>
+                    {/* 4. Public class fields写法  推荐*/}
+                    <div onClick={this.handlerClick4}>click4</div>
+                  </>
+              }
             }
-            handle3 (x,e) {
-            //经过bind处理，name最后一个实参就是传递的合成事件对象
-               console.log(x,this,e)//10,Demo实例
-            }
-            render () {
-               return <>
-                  <button onClick={this.handle1}>按钮1</button>
-                  <button onClick={this.handle2}>按钮2</button>
-                  <button onClick={this.handle3.bind(this,10)}>按钮3</button>
-                  <button onClick={(e)=>{
-                        console.log(this)  //Demo实例
-                  }}>按钮4</button>
-                  </>
-            }
-          }
       ```
 
 3. 合成事件对象`SyntheticBaseEvent`:我们在React合成事件触发的时候，也可以获取到事件对象，只不过此对象是合成事件对象（内部处理，把各个浏览器的事件对象统一化后，构建的一个事件对象），合成事件对象中，包含了常用的属性方法，也保存着`nativeEvent`(浏览器内置原生事件对象)
@@ -1112,7 +1195,7 @@ categories:
             }
       ```
 
-## **复合组件通信** 
+## **组件通信方式** 
 
 ### 单向数据流          
 
@@ -1135,88 +1218,83 @@ categories:
             + 父销毁
             ![](./reactpic/01.png)
 
-### **父子通信**
 
-1. **类组件**       
-      1. 以父组件为主导，基于`props`实现通信：因为只有父组件可以调用子组件
-          + 基于`props`，把信息传递给子组件 （父-->子）
-          + 基于`props.children`（插槽），把HTML结构传递给子组件（父-->子）
-          + 基于`props`，把方法传递给子组件，子组件可以执行（子-->父）
-      2. 父组件基于`ref`获取子组件实例（或者子组件基于`useImperativeHandle`暴露的数据和方法）
+### React 一共有 5 种主流的通信方式
+1. props 和 callback 方式
+2. ref 方式。
+3. React-redux 或 React-mobx 状态管理方式。
+4. context 上下文方式。
+5. event bus 事件总线。
 
+### **props 和 callback 方式**
+
+1. 以父组件为主导，基于`props`实现通信：因为只有父组件可以调用子组件
+      + 基于`props`，把信息传递给子组件 （父-->子）
+      + 基于`props.children`（插槽），把HTML结构传递给子组件（父-->子）
+      + 基于`props`，把方法传递给子组件，子组件可以执行（子-->父）
+
+2. 父组件基于`ref`获取子组件实例（或者子组件基于`useImperativeHandle`暴露的数据和方法）
       ```jsx
-            class Vote extends React.Component {
-                  /* 父组件状态 */
-                  state = {
-                        supNum: 10,
-                        oppNum: 0
-                  }
-                  /* 父组件方法 */
-                  //设置为箭头函数：不论方法在哪里执行，方法中的this永远都是Vote父组件的实例
-                  change = (type) => {
-                        let { supNum, oppNum } = this.state
-                        type === 'sup' ? this.setState({ supNum: supNum + 1 }) : this.setState({ oppNum: oppNum + 1 })
-                  }
-                  render () {
-                        let { supNum, oppNum } = this.state
-                        return <VoteMain supNum={supNum} oppNum={oppNum} change={this.change} />
-                  }
+            /* 子组件 */
+            function Son(props){
+            const {  fatherSay , sayFather  } = props
+            return <div className='son' >
+                  我是子组件
+                  <div> 父组件对我说：{ fatherSay } </div>
+                  <input placeholder="我对父组件说" onChange={ (e)=>sayFather(e.target.value) }   />
+            </div>
             }
-            /* 基于PureComponent实现更新优化 */
-            class VoteMain extends React.PureComponent {
-                  /* 属性规则校验 */
-                  static defaultProps = {}
-                  static propTypes = {
-                        change: PropTypes.func.isRequired
-                  }
-                  render () {
-                        let { supNum, oppNum, change } = this.props
-                        let radio = '--'
-                              , total = supNum + oppNum
-                        if (total > 0) radio = (supNum / total * 100).toFixed(2) + '%'
-                        return <div className="main">
-                              <p>支持人数：{supNum}人</p>
-                              <p>反对人数：{oppNum}人</p>
-                              <p>支持比率：{radio}</p>
-                              <div className="footer">
-                              <Button type="primary" onClick={change.bind(null, 'sup')}>支持</Button>
-                              <Button type="primary" onClick={change.bind(null, 'opp')} danger>反对</Button>
-                              </div>
-                        </div>
-                  }
+            /* 父组件 */
+            function Father(){
+            const [ childSay , setChildSay ] = useState('')
+            const [ fatherSay , setFatherSay ] = useState('')
+            return <div className="box father" >
+                  我是父组件
+                  <div> 子组件对我说：{ childSay } </div>
+                  <input placeholder="我对子组件说" onChange={ (e)=>setFatherSay(e.target.value) }   />
+                  <Son fatherSay={fatherSay}  sayFather={ setChildSay }  />
+            </div>
             }
       ```
 
-2. **函数组件**
+### **event bus事件总线**
++ 需要手动绑定和解绑。
++ 对于小型项目还好，但是对于中大型项目，这种方式的组件通信，会造成牵一发动全身的影响，而且后期难以维护，组件之间的状态也是未知的。
++ 一定程度上违背了 React 数据流向原则。
       ```jsx
-            const Vote = function Vote () {
-                  let [supNum, setSupNum] = useState(10),
-                        [oppNum, setOppNum] = useState(0)
-                  const change = (type) => {
-                        type === 'sup' ? setSupNum(supNum + 1) : setOppNum(oppNum + 1)
-                  }
-                  return <div className="vote-box">
-                        <VoteMain supNum={supNum} oppNum={oppNum} />
-                        <VoteFooter change={change} />
+            import { BusService } from './eventBus'
+            /* event Bus  */
+            function Son(){
+                  const [ fatherSay , setFatherSay ] = useState('')
+                  React.useEffect(()=>{ 
+                        BusService.on('fatherSay',(value)=>{  /* 事件绑定 , 给父组件绑定事件 */
+                              setFatherSay(value)
+                        })
+                        return function(){  BusService.off('fatherSay') /* 解绑事件 */ }
+                  },[])
+                  return <div className='son' >
+                        我是子组件
+                        <div> 父组件对我说：{ fatherSay } </div>
+                        <input placeholder="我对父组件说" onChange={ (e)=> BusService.emit('childSay',e.target.value)  }   />
                   </div>
             }
-
-            const VoteFooter = function VoteFooter (props) {
-                  let { change } = props
-                  return <div className="footer">
-                        <Button type="primary" onClick={change.bind(null, 'sup')}>支持</Button>
-                        <Button type="primary" onClick={change.bind(null, 'opp')} danger>反对</Button>
+            /* 父组件 */
+            function Father(){
+                  const [ childSay , setChildSay ] = useState('')
+                  React.useEffect(()=>{    /* 事件绑定 , 给子组件绑定事件 */
+                        BusService.on('childSay',(value)=>{
+                              setChildSay(value)
+                        })
+                        return function(){  BusService.off('childSay') /* 解绑事件 */ }
+                  },[])
+                  return <div className="box father" >
+                        我是父组件
+                        <div> 子组件对我说：{ childSay } </div>
+                        <input placeholder="我对子组件说" onChange={ (e)=> BusService.emit('fatherSay',e.target.value) }   />
+                        <Son  />
                   </div>
-                  }
-                  VoteFooter.defaultProps = {
-                  }
-                  VoteFooter.propTypes = {
-                  change: PropTypes.func.isRequired,
-                  }
-            export default memo(VoteFooter)
-
+            }
       ```
-
 
 ### **context方案实现祖先后代通信**
 
