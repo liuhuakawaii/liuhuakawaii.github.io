@@ -131,8 +131,10 @@ categories:
       const pointLight = new THREE.PointLight(0xffffff, 1)
       pointLight.position.set(400, 100, 300)
       scene.add(pointLight) 
+
       const ambient = new THREE.AmbientLight(0xffffff, 0.2)
       scene.add(ambient)
+
       const directionalLight = new THREE.DirectionalLight(0xffffff, 1)
       directionalLight.position.set(-80, -100, -50)//设置光源的方向：通过光源position属性和目标指向对象的position属性计算
       // directionalLight.target = mesh  /方向光指向对象网格模型mesh，可以不设置，默认位置是0 0 0 
@@ -146,8 +148,10 @@ categories:
       */
       const axesHelper = new THREE.AxesHelper(5)
       scene.add(axesHelper)
+
       const pointLightHelper = new THREE.PointLightHelper(pointLight, 10)
       scene.add(pointLightHelper)
+      
       const directionalLightHepler = new THREE.DirectionalLightHelper(directionalLight, 5, 0xffff00)
       const gridHelper = new THREE.GridHelper(300, 25, 0x004444, 0x004444);
       scene.add(directionalLightHepler)
