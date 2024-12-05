@@ -112,7 +112,7 @@ import{_ as s,c as i,o as a,a3 as n}from"./chunks/framework.DpzXWsSh.js";const l
 <span class="line"><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">          ARGS</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">&quot;-avzr --delete&quot;</span></span>
 <span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">          </span></span>
 <span class="line"><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;">          # 源目录：你要部署的文件所在目录</span></span>
-<span class="line"><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">          SOURCE</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">&quot;docs/.vitepress/dist/&quot;</span></span>
+<span class="line"><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">          SOURCE</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">&quot;docs/.vitepress/dist&quot;</span></span>
 <span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">          </span></span>
 <span class="line"><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;">          # 服务器IP地址或域名</span></span>
 <span class="line"><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">          REMOTE_HOST</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">\${{ secrets.SSH_HOST }}</span></span>
