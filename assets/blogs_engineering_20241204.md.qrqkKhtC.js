@@ -124,4 +124,22 @@ import{_ as s,c as i,o as a,a3 as n}from"./chunks/framework.DpzXWsSh.js";const l
 <span class="line"><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">          TARGET</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">\${{ secrets.REMOTE_DIR }}</span></span>
 <span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">          </span></span>
 <span class="line"><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;">          # 排除不需要传输的文件/目录</span></span>
-<span class="line"><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">          EXCLUDE</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">&quot;/dist/, /node_modules/&quot;</span></span></code></pre></div>`,26),t=[k];function e(r,E,d,g,F,y){return a(),i("div",null,t)}const C=s(p,[["render",e]]);export{o as __pageData,C as default};
+<span class="line"><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">          EXCLUDE</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">&quot;/dist/, /node_modules/&quot;</span></span></code></pre></div><p>确保在 GitHub 仓库的设置中，将 secrets.SSH_HOST、secrets.SSH_USERNAME 和 secrets.REMOTE_DIR 添加为 secrets。</p><p><strong>注意事项</strong> 路径一定要注意</p><div class="language-sh vp-adaptive-theme"><button title="Copy Code" class="copy"></button><span class="lang">sh</span><pre class="shiki shiki-themes github-light github-dark vp-code"><code><span class="line"><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;"># 组合1</span></span>
+<span class="line"><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">SOURCE:</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> &quot;docs/.vitepress/dist&quot;</span><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;">  # 无斜杠</span></span>
+<span class="line"><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">TARGET:</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> &quot;/var/www/enlightencode/dist&quot;</span></span>
+<span class="line"><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;"># 结果: /var/www/enlightencode/dist/dist/[文件]</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;"># 组合2</span></span>
+<span class="line"><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">SOURCE:</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> &quot;docs/.vitepress/dist/&quot;</span><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;">  # 有斜杠</span></span>
+<span class="line"><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">TARGET:</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> &quot;/var/www/enlightencode/dist&quot;</span></span>
+<span class="line"><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;"># 结果: /var/www/enlightencode/dist/[文件]</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;"># 组合3</span></span>
+<span class="line"><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">SOURCE:</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> &quot;docs/.vitepress/dist&quot;</span><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;">  # 无斜杠</span></span>
+<span class="line"><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">TARGET:</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> &quot;/var/www/enlightencode&quot;</span></span>
+<span class="line"><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;"># 结果: /var/www/enlightencode/dist/[文件]</span></span>
+<span class="line"></span>
+<span class="line"><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;"># 组合4</span></span>
+<span class="line"><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">SOURCE:</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> &quot;docs/.vitepress/dist/&quot;</span><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;">  # 有斜杠</span></span>
+<span class="line"><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">TARGET:</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> &quot;/var/www/enlightencode&quot;</span></span>
+<span class="line"><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;"># 结果: /var/www/enlightencode/[文件]</span></span></code></pre></div>`,29),t=[k];function e(r,d,E,g,F,y){return a(),i("div",null,t)}const A=s(p,[["render",e]]);export{o as __pageData,A as default};
