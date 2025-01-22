@@ -1,0 +1,1 @@
+import{_ as e,c as t,o}from"./chunks/framework.DLSH1pMh.js";const d=JSON.parse('{"title":"","description":"","frontmatter":{},"headers":[],"relativePath":"blogs/operations/linux.md","filePath":"blogs/operations/linux.md"}'),a={name:"blogs/operations/linux.md"};function n(s,r,i,c,l,p){return o(),t("div")}const m=e(a,[["render",n]]);export{d as __pageData,m as default};
