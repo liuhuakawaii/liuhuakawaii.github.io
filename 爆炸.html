@@ -354,6 +354,7 @@
       glbScene.updateMatrixWorld(true);
       computeModelBounds(glbScene);
       const tweens = [];
+      console.log('explode', meshData);
       meshData.forEach((data, mesh) => {
         if (!mesh.parent) return;
         mesh.parent.updateMatrixWorld(true);
