@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>两张图无限单方向循环轮播对比</title>
+  <style>
+    :root {
+      /* 可按需调整整体轮播最大宽度 */
+      --carousel-max-width: 420px;
+    }
+
+    /* ----------- 全局样式 ----------- */
+    body {
+      font-family: system-ui, sans-serif;
+      background: #111;
+      color: #fff;
+      margin: 0;
+      padding: 40px 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 60px;
+    }
+
+    h2 {
+      margin-bottom: 16px;
+      font-weight: 600;
+      font-size: 20px;
+    }
+
+    /* ----------- 方案 A：纯 CSS ----------- */
+    .carousel-css {
+      width: 80%;
+      max-width: var(--carousel-max-width);
+      overflow: hidden;
+      border-radius: 12px;
+      border: 2px solid #555;
+      position: relative;
+    }
+
+    .carousel-css .track {
+      display: flex;
+      width: 400%;
+      /* 四张 slide */
+      animation: scroll 8s linear infinite;
+    }
+
+    .carousel-css .slide {
+      width: 100%;
+      flex-shrink: 0;
+    }
+
+    .carousel-css img {
+      width: 423px;
+      height: auto;
+      display: block;
+      object-fit: cover;
+    }
+
+    @keyframes scroll {
+      from {
+        transform: translateX(0);
+      }
+
+      to {
+        transform: translateX(-200%);
+      }
+    }
+
+    /* 悬停暂停 */
+    .carousel-css:hover .track {
+      animation-play-state: paused;
+    }
+
+    /* ----------- 方案 B：JavaScript 控制 ----------- */
+    .carousel-js {
+      width: 80%;
+      max-width: var(--carousel-max-width);
+      overflow: hidden;
+      border-radius: 12px;
+      border: 2px solid #555;
+      position: relative;
+    }
+
+    .carousel-js .track {
+      display: flex;
+      width: 400%;
+      transform: translateX(0);
+      will-change: transform;
+      transition: none;
+    }
+
+    .carousel-js .slide {
+      width: 100%;
+      flex-shrink: 0;
+    }
+
+    .carousel-js img {
+      width: 100%;
+      height: auto;
+      display: block;
+      object-fit: cover;
+    }
+
+    /* 简单响应式：小屏进一步缩小 */
+    @media (max-width: 480px) {
+      :root {
+        --carousel-max-width: 320px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <h2>方案 A：纯 CSS 无限单方向循环轮播</h2>
+  <div class="carousel-css">
+    <div class="track">
+      <div class="slide"><img src="https://picsum.photos/id/1015/800/400" alt="A"></div>
+      <div class="slide"><img src="https://picsum.photos/id/1016/800/400" alt="B"></div>
+      <div class="slide"><img src="https://picsum.photos/id/1015/800/400" alt="A"></div>
+      <div class="slide"><img src="https://picsum.photos/id/1016/800/400" alt="B"></div>
+    </div>
+  </div>
+
+  <h2>方案 B：JavaScript 控制的无限单方向循环轮播</h2>
+  <div class="carousel-js" id="carousel-js">
+    <div class="track" id="track-js">
+      <div class="slide"><img src="https://picsum.photos/id/1015/800/400" alt="A"></div>
+      <div class="slide"><img src="https://picsum.photos/id/1016/800/400" alt="B"></div>
+      <div class="slide"><img src="https://picsum.photos/id/1015/800/400" alt="A"></div>
+      <div class="slide"><img src="https://picsum.photos/id/1016/800/400" alt="B"></div>
+    </div>
+  </div>
+
+  <script>
+    /* ----------- 方案 B：JS 控制滚动逻辑 ----------- */
+    (function () {
+      const track = document.getElementById('track-js');
+      const container = document.getElementById('carousel-js');
+      let offset = 0;
+      const speed = 60; // px 每秒
+      let last = performance.now();
+      let paused = false;
+      let rafId;
+
+      function loop(now) {
+        if (paused) {
+          last = now;
+          rafId = requestAnimationFrame(loop);
+          return;
+        }
+
+        const dt = (now - last) / 1000;
+        last = now;
+        const slideWidth = track.clientWidth / 4; // 一张的宽度
+        offset -= speed * dt;
+        if (Math.abs(offset) >= 2 * slideWidth) {
+          offset += 2 * slideWidth; // 重置位置
+        }
+        track.style.transform = `translateX(${offset}px)`;
+        rafId = requestAnimationFrame(loop);
+      }
+
+      rafId = requestAnimationFrame(loop);
+
+      container.addEventListener('mouseenter', () => { paused = true; });
+      container.addEventListener('mouseleave', () => { paused = false; });
+    })();
+  </script>
+</body>
+
+</html>
