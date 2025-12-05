@@ -1,0 +1,1085 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>GLB 调试器 — 模型中心/原点学习工具</title>
+  <style>
+    html,
+    body {
+      height: 100%;
+      margin: 0;
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    }
+
+    #app {
+      display: flex;
+      height: 100vh;
+    }
+
+    #left {
+      width: 380px;
+      min-width: 280px;
+      max-width: 480px;
+      background: #0f1724;
+      color: #e6eef8;
+      padding: 12px;
+      box-sizing: border-box;
+      overflow: auto;
+    }
+
+    #viewer {
+      flex: 1;
+      position: relative;
+      background: #111827;
+    }
+
+    canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+
+    h1 {
+      font-size: 16px;
+      margin: 6px 0 12px 0;
+      color: #fff;
+    }
+
+    label,
+    button {
+      font-size: 13px;
+    }
+
+    .control {
+      margin-bottom: 10px;
+    }
+
+    .btn {
+      display: inline-block;
+      background: #0ea5a5;
+      color: #012;
+      padding: 6px 10px;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+      margin-right: 6px
+    }
+
+    .btn.alt {
+      background: #7c3aed;
+      color: white;
+    }
+
+    .btn.warn {
+      background: #f97316;
+      color: white;
+    }
+
+    .small {
+      font-size: 12px;
+      color: #cbd5e1;
+    }
+
+    .node-list {
+      font-family: monospace;
+      background: #071025;
+      padding: 8px;
+      border-radius: 6px;
+      max-height: 280px;
+      overflow: auto;
+    }
+
+    .node-item {
+      padding: 6px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .node-item:hover {
+      background: #07243a;
+    }
+
+    .selected {
+      background: #134e4a;
+    }
+
+    .label {
+      position: absolute;
+      pointer-events: none;
+      transform: translate(-50%, -120%);
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 12px;
+      background: rgba(0, 0, 0, 0.6);
+      color: #fff;
+      white-space: nowrap;
+    }
+
+    .legend {
+      margin-top: 8px;
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .sw {
+      width: 12px;
+      height: 12px;
+      border-radius: 3px;
+      display: inline-block;
+    }
+
+    .sw.red {
+      background: #ef4444;
+    }
+
+    /* pivot */
+    .sw.blue {
+      background: #3b82f6;
+    }
+
+    /* bbox center */
+    .sw.green {
+      background: #10b981;
+    }
+
+    /* scene origin */
+    .footer {
+      margin-top: 14px;
+      font-size: 12px;
+      color: #9aa7b2;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      padding: 8px;
+      border-radius: 6px;
+      border: 1px solid #18303b;
+      background: #061018;
+      color: #dbeafe;
+      margin-top: 6px;
+      box-sizing: border-box;
+    }
+
+    input[type="file"] {
+      color: #dbeafe;
+    }
+
+    .row {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .info {
+      font-size: 12px;
+      color: #9aa7b2;
+      margin-top: 6px;
+    }
+
+    .toggle {
+      cursor: pointer;
+      padding: 4px 8px;
+      border-radius: 6px;
+      background: #072234;
+      color: #9ccfd8;
+      display: inline-block;
+    }
+
+    .concept-box {
+      background: #1a2332;
+      border-left: 3px solid #0ea5a5;
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 6px;
+    }
+
+    .concept-title {
+      font-weight: bold;
+      color: #0ea5a5;
+      margin-bottom: 6px;
+      font-size: 14px;
+    }
+
+    .formula {
+      background: #0a1420;
+      padding: 8px;
+      border-radius: 4px;
+      font-family: 'Courier New', monospace;
+      font-size: 12px;
+      color: #fbbf24;
+      margin: 6px 0;
+      overflow-x: auto;
+    }
+
+    .step-box {
+      background: #162536;
+      padding: 8px;
+      margin: 6px 0;
+      border-radius: 4px;
+      font-size: 12px;
+    }
+
+    .step-title {
+      color: #60a5fa;
+      font-weight: bold;
+      margin-bottom: 4px;
+    }
+
+    .highlight {
+      color: #fbbf24;
+      font-weight: bold;
+    }
+
+    .section-title {
+      font-size: 14px;
+      font-weight: bold;
+      color: #0ea5a5;
+      margin: 14px 0 8px 0;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #1a2332;
+    }
+
+    .calc-result {
+      background: #0f2e3a;
+      padding: 6px 8px;
+      border-radius: 4px;
+      margin: 4px 0;
+      font-size: 12px;
+      border-left: 2px solid #10b981;
+    }
+
+    code {
+      background: #0a1420;
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-family: 'Courier New', monospace;
+      color: #fbbf24;
+      font-size: 11px;
+    }
+  </style>
+  <!-- 使用 Import map 引入 Three.js -->
+  <script type="importmap">
+          {
+              "imports": {
+                  "three": "https://esm.sh/three@0.160.0",
+                  "three/addons/": "https://esm.sh/three@0.160.0/examples/jsm/"
+              }
+          }
+      </script>
+</head>
+
+<body>
+  <div id="app">
+    <div id="left">
+      <h1>📐 3D模型中心/原点学习工具</h1>
+
+      <div class="section-title">🎯 核心概念说明</div>
+
+      <div class="concept-box">
+        <div class="concept-title">1️⃣ Local Origin (局部原点 / Pivot)</div>
+        <div class="small">节点自身坐标系的原点 (0,0,0)</div>
+        <div class="formula">世界坐标 = node.localToWorld(Vector3(0,0,0))</div>
+        <div class="small" style="margin-top:4px">
+          💡 这是节点的"锚点"，所有变换（旋转、缩放）都围绕这个点进行。
+        </div>
+      </div>
+
+      <div class="concept-box">
+        <div class="concept-title">2️⃣ BBox Center (包围盒中心)</div>
+        <div class="small">节点及其子节点所有顶点的AABB中心</div>
+        <div class="formula">
+          box = Box3().setFromObject(node)<br />
+          center = (box.min + box.max) / 2
+        </div>
+        <div class="small" style="margin-top:4px">
+          💡 这是几何体的"视觉中心"，不受节点变换影响。
+        </div>
+      </div>
+
+      <div class="concept-box">
+        <div class="concept-title">3️⃣ Scene Origin (世界原点)</div>
+        <div class="small">整个3D场景的绝对原点</div>
+        <div class="formula">世界坐标 = Vector3(0, 0, 0)</div>
+        <div class="small" style="margin-top:4px">
+          💡 所有对象的世界坐标都相对于这个点。
+        </div>
+      </div>
+
+      <div class="section-title">📦 加载模型</div>
+      <div class="control">
+        <div class="row">
+          <input id="urlInput" type="text" placeholder="输入 .glb/.gltf URL" />
+          <button id="loadUrl" class="btn">Load</button>
+        </div>
+        <div class="row">
+          <input id="fileInput" type="file" accept=".glb,.gltf" />
+        </div>
+        <div class="info">💡 支持拖拽文件到右侧视图</div>
+      </div>
+
+      <div class="section-title">🎨 可视化控制</div>
+      <div class="control">
+        <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+          <button id="toggleBBoxHelper" class="btn alt">包围盒</button>
+          <button id="toggleAxes" class="btn">坐标轴</button>
+          <button id="toggleMarkers" class="btn">标记点</button>
+          <button id="toggleLocalAxes" class="btn">局部坐标系</button>
+        </div>
+        <div style="margin-top:8px">
+          <button id="autoCenter" class="btn warn">居中到BBox中心</button>
+        </div>
+      </div>
+
+      <div class="section-title">🌳 节点树</div>
+      <div class="control">
+        <div class="small">点击节点查看详细计算过程</div>
+        <div class="node-list" id="nodeList">（加载模型后显示）</div>
+        <div style="margin-top:8px">
+          <button id="findFirstMesh" class="btn">定位第一个Mesh</button>
+          <button id="resetTransforms" class="btn alt">重置变换</button>
+        </div>
+      </div>
+
+      <div class="section-title">📊 详细计算过程</div>
+      <div class="control">
+        <div id="selectedInfo" style="font-size: 12px;">未选择节点</div>
+      </div>
+
+      <div class="section-title">🎨 颜色图例</div>
+      <div class="control">
+        <div class="legend">
+          <div><span class="sw red"></span> Local Origin (红)</div>
+          <div><span class="sw blue"></span> BBox Center (蓝)</div>
+          <div><span class="sw green"></span> Scene Origin (绿)</div>
+        </div>
+      </div>
+
+      <div class="footer">
+        <div class="section-title">📖 使用指南</div>
+        <ol style="padding-left:16px; font-size: 12px;">
+          <li>加载一个 GLB/GLTF 模型</li>
+          <li>在节点树中选择节点</li>
+          <li>查看右侧的三个标记点和详细计算过程</li>
+          <li>对比 Local Origin 和 BBox Center 的区别</li>
+          <li>使用"居中"按钮体验坐标变换</li>
+        </ol>
+        <div class="small" style="margin-top:8px; color: #64748b;">
+          💡 提示：很多建模软件（如Blender）导出时，模型的Local Origin可能不在几何中心。
+          这个工具帮助你理解和调试这种情况。
+        </div>
+      </div>
+    </div>
+
+    <div id="viewer">
+      <div id="labelPivot" class="label" style="display:none"><strong>Pivot</strong>
+        <div class="small" id="pivotText"></div>
+      </div>
+      <div id="labelBBox" class="label" style="display:none"><strong>BBox Center</strong>
+        <div class="small" id="bboxText"></div>
+      </div>
+      <div id="labelScene" class="label" style="display:none"><strong>Scene Origin</strong>
+        <div class="small" id="sceneText">0,0,0</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- three + gltfloader modules (ESM) -->
+  <script type="module">
+    import * as THREE from 'three';
+    import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+    import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+    // import { Box3Helper } from 'three/addons/helpers/Box3Helper.js';
+    // import { BoxHelper } from 'three/addons/helpers/BoxHelper.js';
+    import { TransformControls } from 'three/addons/controls/TransformControls.js';
+
+    const container = document.getElementById('viewer');
+    const labelPivot = document.getElementById('labelPivot');
+    const labelBBox = document.getElementById('labelBBox');
+    const labelScene = document.getElementById('labelScene');
+    const pivotText = document.getElementById('pivotText');
+    const bboxText = document.getElementById('bboxText');
+
+    let scene, camera, renderer, controls;
+    let loadedRoot = null; // gltf.scene
+    let currentSelected = null;
+    let boxHelper = null;
+    let bboxCenterSphere = null;
+    let pivotSphere = null;
+    let sceneOriginSphere = null;
+    let bboxHelperVisible = true;
+    let markersVisible = true;
+    let axesHelper = null;
+    let localAxesHelper = null;
+    let localAxesVisible = true;
+
+    init();
+    animate();
+
+    function init() {
+      // renderer
+      renderer = new THREE.WebGLRenderer({ antialias: true });
+      renderer.setPixelRatio(window.devicePixelRatio);
+      renderer.setSize(container.clientWidth, container.clientHeight);
+      container.appendChild(renderer.domElement);
+
+      // scene & camera
+      scene = new THREE.Scene();
+      scene.background = new THREE.Color(0x0b1220);
+      camera = new THREE.PerspectiveCamera(50, container.clientWidth / container.clientHeight, 0.01, 2000);
+      camera.position.set(3, 2, 4);
+
+      // controls
+      controls = new OrbitControls(camera, renderer.domElement);
+      controls.enableDamping = true;
+
+      // lights
+      const hemi = new THREE.HemisphereLight(0xffffff, 0x444444, 1.0);
+      hemi.position.set(0, 10, 0);
+      scene.add(hemi);
+      const dir = new THREE.DirectionalLight(0xffffff, 0.8);
+      dir.position.set(3, 10, 5);
+      scene.add(dir);
+
+      // grid & axes helper
+      const grid = new THREE.GridHelper(10, 20, 0x1f2937, 0x0f1724);
+      scene.add(grid);
+
+      axesHelper = new THREE.AxesHelper(1.5);
+      scene.add(axesHelper);
+
+      // scene origin marker (green)
+      sceneOriginSphere = createMarkerSphere(0.05, 0x10b981);
+      sceneOriginSphere.position.set(0, 0, 0);
+      scene.add(sceneOriginSphere);
+      labelScene.style.display = 'block';
+
+      // interactions
+      window.addEventListener('resize', onWindowResize);
+      setupUI();
+    }
+
+    // UI wiring
+    function setupUI() {
+      const fileInput = document.getElementById('fileInput');
+      const loadUrlBtn = document.getElementById('loadUrl');
+      const urlInput = document.getElementById('urlInput');
+      const toggleBBoxBtn = document.getElementById('toggleBBoxHelper');
+      const toggleAxesBtn = document.getElementById('toggleAxes');
+      const toggleMarkersBtn = document.getElementById('toggleMarkers');
+      const toggleLocalAxesBtn = document.getElementById('toggleLocalAxes');
+      const autoCenterBtn = document.getElementById('autoCenter');
+      const nodeList = document.getElementById('nodeList');
+      const findFirstMeshBtn = document.getElementById('findFirstMesh');
+      const resetTransformsBtn = document.getElementById('resetTransforms');
+
+      fileInput.addEventListener('change', async (ev) => {
+        const f = ev.target.files[0];
+        if (f) {
+          const url = URL.createObjectURL(f);
+          await loadGLB(url, f.name);
+          URL.revokeObjectURL(url);
+        }
+      });
+
+      loadUrlBtn.addEventListener('click', async () => {
+        const url = urlInput.value.trim();
+        if (!url) { alert('请输入 glb/gltf URL'); return; }
+        await loadGLB(url, url);
+      });
+
+      toggleBBoxBtn.addEventListener('click', () => {
+        bboxHelperVisible = !bboxHelperVisible;
+        if (boxHelper) boxHelper.visible = bboxHelperVisible;
+      });
+
+      toggleAxesBtn.addEventListener('click', () => {
+        axesHelper.visible = !axesHelper.visible;
+      });
+
+      toggleMarkersBtn.addEventListener('click', () => {
+        markersVisible = !markersVisible;
+        updateMarkersVisibility();
+      });
+
+      toggleLocalAxesBtn.addEventListener('click', () => {
+        localAxesVisible = !localAxesVisible;
+        if (localAxesHelper) localAxesHelper.visible = localAxesVisible;
+      });
+
+      autoCenterBtn.addEventListener('click', () => {
+        if (!loadedRoot) return alert('请先加载模型');
+        centerModelToBBox(loadedRoot);
+      });
+
+      findFirstMeshBtn.addEventListener('click', () => {
+        if (!loadedRoot) return alert('请先加载模型');
+        const mesh = findFirstMesh(loadedRoot);
+        if (mesh) selectNode(mesh);
+        else alert('未找到 mesh 节点');
+      });
+
+      resetTransformsBtn.addEventListener('click', () => {
+        if (!loadedRoot) return alert('请先加载模型');
+        loadedRoot.position.set(0, 0, 0);
+        loadedRoot.rotation.set(0, 0, 0);
+        loadedRoot.scale.set(1, 1, 1);
+        updateAllHelpers();
+      });
+
+      // 点击节点列表选择
+      nodeList.addEventListener('click', (ev) => {
+        const el = ev.target.closest('.node-item');
+        if (!el) return;
+        const uuid = el.dataset.uuid;
+        const obj = scene.getObjectByProperty('uuid', uuid);
+        if (obj) selectNode(obj);
+      });
+
+      // 支持拖拽到视图
+      container.addEventListener('dragover', (e) => { e.preventDefault(); });
+      container.addEventListener('drop', async (e) => {
+        e.preventDefault();
+        const f = e.dataTransfer.files?.[0];
+        if (f) {
+          const url = URL.createObjectURL(f);
+          await loadGLB(url, f.name);
+          URL.revokeObjectURL(url);
+        }
+      });
+    }
+
+    // 加载 glb/gltf
+    async function loadGLB(url, name = 'model') {
+      // 清理旧模型
+      if (loadedRoot) {
+        scene.remove(loadedRoot);
+        disposeObject(loadedRoot);
+        loadedRoot = null;
+      }
+      if (boxHelper) { scene.remove(boxHelper); boxHelper = null; }
+      if (pivotSphere) { scene.remove(pivotSphere); pivotSphere = null; }
+      if (bboxCenterSphere) { scene.remove(bboxCenterSphere); bboxCenterSphere = null; }
+      if (localAxesHelper) { scene.remove(localAxesHelper); localAxesHelper = null; }
+
+      const loader = new GLTFLoader();
+      try {
+        const gltf = await new Promise((resolve, reject) => loader.load(url, resolve, undefined, reject));
+        loadedRoot = gltf.scene || gltf.scenes?.[0] || null;
+        if (!loadedRoot) return alert('模型加载后未找到 scene');
+
+        // 为了调试方便，把模型以一个容器 Group 包起来（如果它已经是 Group 也没事）
+        const containerGroup = new THREE.Group();
+        containerGroup.name = `ROOT_${name}`;
+        containerGroup.add(loadedRoot);
+        scene.add(containerGroup);
+        loadedRoot = containerGroup; // 使用 containerGroup 作为操作 root
+
+        // 自动缩放/居中视角：计算 bbox 并缩放摄像机距离
+        fitCameraToObject(camera, controls, loadedRoot, 1.2);
+
+        // 添加 box helper（可见包围盒）
+        const box = new THREE.Box3().setFromObject(loadedRoot);
+        boxHelper = new THREE.Box3Helper(box, 0xffffff);
+        scene.add(boxHelper);
+
+        // 建立可视 marker（pivot / bbox center）
+        pivotSphere = createMarkerSphere(0.04, 0xef4444); // 红色 pivot
+        bboxCenterSphere = createMarkerSphere(0.05, 0x3b82f6); // 蓝色 bbox center
+        scene.add(pivotSphere);
+        scene.add(bboxCenterSphere);
+
+        // 更新节点树UI
+        buildNodeList(loadedRoot);
+
+        // 选择默认节点（root.children[0] if exists）
+        if (loadedRoot.children.length > 0) selectNode(loadedRoot.children[0]);
+        else selectNode(loadedRoot);
+
+        updateAllHelpers();
+      } catch (err) {
+        console.error(err);
+        alert('加载模型失败，见控制台');
+      }
+    }
+
+    function disposeObject(obj) {
+      obj.traverse((c) => {
+        if (c.geometry) c.geometry.dispose();
+        if (c.material) {
+          if (Array.isArray(c.material)) c.material.forEach(m => m.dispose());
+          else c.material.dispose();
+        }
+      });
+    }
+
+    // 创建可视球体 marker
+    function createMarkerSphere(radius = 0.05, color = 0xff0000) {
+      const geo = new THREE.SphereGeometry(radius, 16, 12);
+      const mat = new THREE.MeshBasicMaterial({ color: color });
+      const m = new THREE.Mesh(geo, mat);
+      m.renderOrder = 999;
+      m.frustumCulled = false;
+      return m;
+    }
+
+    // 更新显示所有 helper：bbox helper、轴、marker
+    function updateAllHelpers() {
+      if (!loadedRoot) return;
+      // 更新 boxHelper
+      const box = new THREE.Box3().setFromObject(loadedRoot);
+      if (boxHelper) {
+        scene.remove(boxHelper);
+        boxHelper = new THREE.Box3Helper(box, 0xffffff);
+        boxHelper.visible = bboxHelperVisible;
+        scene.add(boxHelper);
+      } else {
+        boxHelper = new THREE.Box3Helper(box, 0xffffff);
+        boxHelper.visible = bboxHelperVisible;
+        scene.add(boxHelper);
+      }
+      updateMarkersVisibility();
+      updateMarkerPositionsForSelected();
+    }
+
+    // 显示或隐藏 marker
+    function updateMarkersVisibility() {
+      if (pivotSphere) pivotSphere.visible = markersVisible;
+      if (bboxCenterSphere) bboxCenterSphere.visible = markersVisible;
+      if (labelPivot) labelPivot.style.display = markersVisible ? 'block' : 'none';
+      if (labelBBox) labelBBox.style.display = markersVisible ? 'block' : 'none';
+      if (labelScene) labelScene.style.display = markersVisible ? 'block' : 'none';
+    }
+
+    // 选择节点
+    function selectNode(obj) {
+      currentSelected = obj;
+      highlightNodeInList(obj);
+      updateMarkerPositionsForSelected();
+      updateLocalAxesHelper();
+      showSelectedInfo();
+    }
+
+    // 在左侧节点树中高亮
+    function highlightNodeInList(obj) {
+      const items = document.querySelectorAll('.node-item');
+      items.forEach(it => it.classList.toggle('selected', it.dataset.uuid === obj.uuid));
+    }
+
+    // 更新局部坐标系辅助线
+    function updateLocalAxesHelper() {
+      if (localAxesHelper) {
+        scene.remove(localAxesHelper);
+        localAxesHelper = null;
+      }
+
+      if (!currentSelected) return;
+
+      // 创建局部坐标系（显示在节点的 local origin 位置）
+      localAxesHelper = new THREE.AxesHelper(0.5);
+
+      // 获取节点的世界变换
+      currentSelected.updateWorldMatrix(true, false);
+      const worldPos = new THREE.Vector3();
+      currentSelected.localToWorld(worldPos.set(0, 0, 0));
+
+      // 设置位置和旋转
+      localAxesHelper.position.copy(worldPos);
+      localAxesHelper.quaternion.copy(currentSelected.getWorldQuaternion(new THREE.Quaternion()));
+
+      // 根据包围盒大小调整坐标轴长度
+      const box = new THREE.Box3().setFromObject(currentSelected);
+      const size = box.getSize(new THREE.Vector3());
+      const maxSize = Math.max(size.x, size.y, size.z);
+      localAxesHelper.scale.setScalar(Math.max(0.3, maxSize * 0.3));
+
+      localAxesHelper.visible = localAxesVisible;
+      scene.add(localAxesHelper);
+    }
+
+    // 构建节点树（平级列表，包含 indent）
+    function buildNodeList(root) {
+      const nodeList = document.getElementById('nodeList');
+      nodeList.innerHTML = '';
+      const rows = [];
+      function walk(node, depth = 0) {
+        const name = node.name || node.type;
+        const el = document.createElement('div');
+        el.className = 'node-item';
+        el.style.paddingLeft = (8 + depth * 10) + 'px';
+        el.dataset.uuid = node.uuid;
+        el.textContent = `${name} (${node.type})`;
+        nodeList.appendChild(el);
+        for (const ch of node.children) walk(ch, depth + 1);
+      }
+      walk(root, 0);
+    }
+
+    // 显示选择节点的信息（pivot 和 bbox）- 详细教学版
+    function showSelectedInfo() {
+      const info = document.getElementById('selectedInfo');
+      if (!currentSelected) {
+        info.innerHTML = '<div class="small" style="color: #64748b;">请在节点树中选择一个节点</div>';
+        return;
+      }
+
+      // 1. 获取节点的局部坐标
+      const localPos = currentSelected.position.clone();
+      const localRot = currentSelected.rotation.clone();
+      const localScale = currentSelected.scale.clone();
+
+      // 2. pivot world pos (局部原点的世界坐标)
+      const pivotWorld = new THREE.Vector3();
+      currentSelected.updateWorldMatrix(true, false);
+      currentSelected.localToWorld(pivotWorld.set(0, 0, 0));
+
+      // 3. bbox (基于整个 selected 子树)
+      const box = new THREE.Box3().setFromObject(currentSelected);
+      const bboxCenter = box.getCenter(new THREE.Vector3());
+      const bboxSize = box.getSize(new THREE.Vector3());
+      const bboxMin = box.min;
+      const bboxMax = box.max;
+
+      // 4. 计算偏移量（Local Origin 和 BBox Center 的差值）
+      const offset = new THREE.Vector3().subVectors(bboxCenter, pivotWorld);
+
+      // 5. 获取父节点信息
+      const parentInfo = currentSelected.parent
+        ? `${currentSelected.parent.name || currentSelected.parent.type}`
+        : '无 (根节点)';
+
+      // 6. 世界变换矩阵
+      const worldMatrix = currentSelected.matrixWorld.clone();
+
+      info.innerHTML = `
+    <div style="background: #1a2332; padding: 8px; border-radius: 6px; margin-bottom: 8px;">
+      <div style="font-weight: bold; color: #0ea5a5; margin-bottom: 6px;">
+        当前节点: <span style="color: #fbbf24;">${currentSelected.name || '(unnamed)'}</span>
+      </div>
+      <div class="small">类型: ${currentSelected.type} | 父节点: ${parentInfo}</div>
+    </div>
+
+    <!-- 计算步骤 1: Local Origin -->
+    <div class="step-box">
+      <div class="step-title">🔴 步骤1: 计算 Local Origin (局部原点)</div>
+      <div class="small">局部坐标系的原点，所有变换的"锚点"</div>
+      <div class="formula">localOrigin = Vector3(0, 0, 0)</div>
+      <div class="small" style="margin-top: 4px;">转换到世界坐标:</div>
+      <div class="formula">worldOrigin = node.localToWorld(localOrigin)</div>
+      <div class="calc-result">
+        <strong>结果:</strong> (${vToStr(pivotWorld)})
+      </div>
+    </div>
+
+    <!-- 节点的局部变换 -->
+    <div class="step-box">
+      <div class="step-title">📐 节点的局部变换</div>
+      <div class="small">相对于父节点的变换</div>
+      <div class="calc-result">
+        <strong>位置 (Position):</strong> (${vToStr(localPos)})<br/>
+        <strong>旋转 (Rotation):</strong> (${localRot.x.toFixed(3)}, ${localRot.y.toFixed(3)}, ${localRot.z.toFixed(3)}) rad<br/>
+        <strong>缩放 (Scale):</strong> (${vToStr(localScale)})
+      </div>
+    </div>
+
+    <!-- 计算步骤 2: BBox -->
+    <div class="step-box">
+      <div class="step-title">🔵 步骤2: 计算 BBox Center (包围盒中心)</div>
+      <div class="small">遍历节点及其子节点的所有顶点，计算AABB</div>
+      <div class="formula">
+        box = new Box3().setFromObject(node)<br/>
+        // 遍历所有 mesh 的顶点，找出 min/max
+      </div>
+      <div class="calc-result">
+        <strong>包围盒范围:</strong><br/>
+        Min: (${vToStr(bboxMin)})<br/>
+        Max: (${vToStr(bboxMax)})
+      </div>
+      <div class="small" style="margin-top: 4px;">计算中心点:</div>
+      <div class="formula">center = (min + max) / 2</div>
+      <div class="calc-result">
+        <strong>结果:</strong> (${vToStr(bboxCenter)})
+      </div>
+      <div class="calc-result" style="margin-top: 4px;">
+        <strong>包围盒尺寸:</strong> (${vToStr(bboxSize)})
+      </div>
+    </div>
+
+    <!-- 计算步骤 3: 对比 -->
+    <div class="step-box" style="background: #1e293b;">
+      <div class="step-title">📊 步骤3: 对比两个中心</div>
+      <div class="small">计算 BBox Center 相对于 Local Origin 的偏移</div>
+      <div class="formula">offset = bboxCenter - localOrigin</div>
+      <div class="calc-result">
+        <strong>偏移量:</strong> (${vToStr(offset)})<br/>
+        <strong>偏移距离:</strong> ${offset.length().toFixed(3)} 单位
+      </div>
+      <div class="small" style="margin-top: 6px; color: #94a3b8;">
+        ${offset.length() < 0.001
+          ? '✅ Local Origin 和 BBox Center 基本重合，模型已居中！'
+          : '⚠️ Local Origin 偏离几何中心，这是常见情况。<br/>可以使用"居中到BBox中心"按钮调整。'
+        }
+      </div>
+    </div>
+
+    <!-- 关键概念说明 -->
+    <div style="background: #0f1a2a; padding: 8px; border-radius: 6px; margin-top: 8px; font-size: 11px; color: #94a3b8;">
+      <div style="font-weight: bold; color: #60a5fa; margin-bottom: 4px;">💡 关键理解</div>
+      <ul style="margin: 4px 0; padding-left: 20px;">
+        <li><strong>Local Origin</strong>: 取决于建模时设置的原点位置</li>
+        <li><strong>BBox Center</strong>: 总是几何体的视觉中心</li>
+        <li>两者不同时，旋转会围绕 Local Origin 进行</li>
+        <li>居中操作会调整 position，使 Local Origin 移到 BBox Center</li>
+      </ul>
+    </div>
+  `;
+
+      // 更新 label texts
+      pivotText.textContent = vToStr(pivotWorld);
+      bboxText.textContent = vToStr(bboxCenter);
+    }
+
+    // 更新 marker 位置（基于 currentSelected）
+    function updateMarkerPositionsForSelected() {
+      if (!currentSelected) return;
+      // pivot world pos
+      const pivotWorld = new THREE.Vector3();
+      currentSelected.updateWorldMatrix(true, false);
+      currentSelected.localToWorld(pivotWorld.set(0, 0, 0));
+      if (pivotSphere) pivotSphere.position.copy(pivotWorld);
+
+      // bbox center (for selected subtree)
+      const box = new THREE.Box3().setFromObject(currentSelected);
+      const bboxCenter = box.getCenter(new THREE.Vector3());
+      if (bboxCenterSphere) bboxCenterSphere.position.copy(bboxCenter);
+
+      // scene origin is fixed at (0,0,0) already
+      if (labelScene) labelScene.style.display = markersVisible ? 'block' : 'none';
+    }
+
+    // 在 render loop 中更新屏幕上的标签位置
+    function updateScreenLabels() {
+      if (!currentSelected) return;
+      const pivotWorld = pivotSphere ? pivotSphere.position : null;
+      const bboxWorld = bboxCenterSphere ? bboxCenterSphere.position : null;
+      if (pivotWorld) setLabelPosition(labelPivot, pivotWorld);
+      if (bboxWorld) setLabelPosition(labelBBox, bboxWorld);
+      // scene origin label
+      setLabelPosition(labelScene, new THREE.Vector3(0, 0, 0));
+    }
+
+    // 把世界坐标投影到屏幕并放置 HTML label
+    function setLabelPosition(labelEl, worldPos) {
+      const vector = worldPos.clone().project(camera);
+      const x = (vector.x * 0.5 + 0.5) * renderer.domElement.clientWidth;
+      const y = (-vector.y * 0.5 + 0.5) * renderer.domElement.clientHeight;
+      labelEl.style.transform = 'translate(-50%,-120%)';
+      labelEl.style.left = `${x}px`;
+      labelEl.style.top = `${y}px`;
+    }
+
+    // 辅助：向量转字符串
+    function vToStr(v) {
+      return `${v.x.toFixed(3)}, ${v.y.toFixed(3)}, ${v.z.toFixed(3)}`;
+    }
+
+    // 查找第一个 mesh
+    function findFirstMesh(root) {
+      let found = null;
+      root.traverse((c) => {
+        if (!found && c.isMesh) found = c;
+      });
+      return found;
+    }
+
+    // 把模型的几何中心移动到模型局部原点（等效 Three.js 侧把 bbox center 移到 local origin）
+    // 注意：这会修改 model 的 position（平移整个 root），不是修改原始 mesh 顶点
+    function centerModelToBBox(root) {
+      // 1. 计算当前的 bbox center（基于 root 子树）
+      const box = new THREE.Box3().setFromObject(root);
+      const oldCenter = box.getCenter(new THREE.Vector3());
+
+      // 2. 计算当前的 local origin 世界坐标
+      const oldOrigin = new THREE.Vector3();
+      root.updateWorldMatrix(true, false);
+      root.localToWorld(oldOrigin.set(0, 0, 0));
+
+      // 3. 计算偏移量
+      const offset = new THREE.Vector3().subVectors(oldCenter, oldOrigin);
+
+      console.log('🎯 执行居中操作:');
+      console.log('  - 原 BBox Center:', oldCenter.toArray());
+      console.log('  - 原 Local Origin:', oldOrigin.toArray());
+      console.log('  - 偏移量:', offset.toArray());
+
+      // 4. 将 root 移动（平移整个容器）——把几何中心移动到 root 的 local origin
+      // 实际上是让 local origin 移动到 bbox center 的位置
+      root.position.sub(oldCenter);
+
+      console.log('  - 新 Position:', root.position.toArray());
+      console.log('✅ 居中完成！现在 Local Origin 与 BBox Center 重合');
+
+      updateAllHelpers();
+      if (currentSelected === root || root.children.includes(currentSelected)) {
+        selectNode(currentSelected); // 刷新显示
+      }
+    }
+
+    // camera fit
+    function fitCameraToObject(camera, controls, object, offset = 1.25) {
+      // object: THREE.Object3D
+      const box = new THREE.Box3().setFromObject(object);
+      const size = box.getSize(new THREE.Vector3());
+      const center = box.getCenter(new THREE.Vector3());
+
+      // get max size of the object (AABB)
+      const maxSize = Math.max(size.x, size.y, size.z);
+      const fitHeightDistance = maxSize / (2 * Math.atan(Math.PI * camera.fov / 360));
+      const fitWidthDistance = fitHeightDistance / camera.aspect;
+      const distance = offset * Math.max(fitHeightDistance, fitWidthDistance);
+
+      // set camera to frame
+      camera.position.copy(center);
+      camera.position.x += distance;
+      camera.position.y += distance * 0.6;
+      camera.position.z += distance;
+      camera.lookAt(center);
+
+      // update controls
+      if (controls) {
+        controls.target.copy(center);
+        controls.update();
+      }
+    }
+
+    // 打印整个 scene 对象结构（console）
+    function logSceneTree(root) {
+      root.traverse((n) => {
+        console.log(n.type, n.name || '', n.uuid, 'pos', n.position.toArray(), 'rot', n.rotation.toArray(), 'scale', n.scale.toArray());
+      });
+    }
+
+    // 查找承载 origin 偏移的节点（简单 heuristic：position != 0 或 rotation != 0 或 scale != 1）
+    function findNodesWithNonIdentityTransform(root) {
+      const res = [];
+      root.traverse((n) => {
+        if (n === root) return;
+        if (!n.isObject3D) return;
+        if (n.position.x !== 0 || n.position.y !== 0 || n.position.z !== 0 ||
+          n.rotation.x !== 0 || n.rotation.y !== 0 || n.rotation.z !== 0 ||
+          n.scale.x !== 1 || n.scale.y !== 1 || n.scale.z !== 1) {
+          res.push(n);
+        }
+      });
+      return res;
+    }
+
+    // 帧循环
+    function animate() {
+      requestAnimationFrame(animate);
+      controls.update();
+      if (loadedRoot && currentSelected) {
+        updateMarkerPositionsForSelected();
+        updateScreenLabels();
+        // 更新局部坐标系位置（如果节点有动画或变换）
+        if (localAxesHelper && localAxesHelper.visible) {
+          const worldPos = new THREE.Vector3();
+          currentSelected.updateWorldMatrix(true, false);
+          currentSelected.localToWorld(worldPos.set(0, 0, 0));
+          localAxesHelper.position.copy(worldPos);
+          localAxesHelper.quaternion.copy(currentSelected.getWorldQuaternion(new THREE.Quaternion()));
+        }
+      }
+      renderer.render(scene, camera);
+    }
+
+    // 窗口大小改变
+    function onWindowResize() {
+      camera.aspect = container.clientWidth / container.clientHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(container.clientWidth, container.clientHeight);
+    }
+
+    // 辅助：把 world pos 输出到控制台（详细版 - 用于学习）
+    function debugPrintCurrent() {
+      if (!currentSelected) return console.warn('❌ 未选择节点');
+
+      console.log('='.repeat(60));
+      console.log('📊 当前节点详细信息');
+      console.log('='.repeat(60));
+
+      // 基本信息
+      console.log('\n📌 基本信息:');
+      console.log('  名称:', currentSelected.name || '(unnamed)');
+      console.log('  类型:', currentSelected.type);
+      console.log('  UUID:', currentSelected.uuid);
+
+      // 局部变换
+      console.log('\n📐 局部变换 (相对父节点):');
+      console.log('  Position:', currentSelected.position.toArray());
+      console.log('  Rotation:', currentSelected.rotation.toArray(), '(弧度)');
+      console.log('  Scale:', currentSelected.scale.toArray());
+
+      // Local Origin 世界坐标
+      currentSelected.updateWorldMatrix(true, false);
+      const pivotWorld = new THREE.Vector3().set(0, 0, 0);
+      currentSelected.localToWorld(pivotWorld);
+      console.log('\n🔴 Local Origin (局部原点):');
+      console.log('  局部坐标:', [0, 0, 0]);
+      console.log('  世界坐标:', pivotWorld.toArray());
+
+      // BBox 信息
+      const box = new THREE.Box3().setFromObject(currentSelected);
+      const bboxCenter = box.getCenter(new THREE.Vector3());
+      const bboxSize = box.getSize(new THREE.Vector3());
+      console.log('\n🔵 BBox (包围盒):');
+      console.log('  Min:', box.min.toArray());
+      console.log('  Max:', box.max.toArray());
+      console.log('  Center:', bboxCenter.toArray());
+      console.log('  Size:', bboxSize.toArray());
+
+      // 偏移量
+      const offset = new THREE.Vector3().subVectors(bboxCenter, pivotWorld);
+      console.log('\n📊 偏移分析:');
+      console.log('  BBox Center - Local Origin:', offset.toArray());
+      console.log('  偏移距离:', offset.length().toFixed(4));
+
+      if (offset.length() < 0.001) {
+        console.log('  ✅ Local Origin 和 BBox Center 基本重合！');
+      } else {
+        console.log('  ⚠️ Local Origin 偏离几何中心');
+      }
+
+      // 世界矩阵
+      console.log('\n🌍 世界变换矩阵:');
+      const m = currentSelected.matrixWorld.elements;
+      console.log('  [', m[0].toFixed(3), m[4].toFixed(3), m[8].toFixed(3), m[12].toFixed(3), ']');
+      console.log('  [', m[1].toFixed(3), m[5].toFixed(3), m[9].toFixed(3), m[13].toFixed(3), ']');
+      console.log('  [', m[2].toFixed(3), m[6].toFixed(3), m[10].toFixed(3), m[14].toFixed(3), ']');
+      console.log('  [', m[3].toFixed(3), m[7].toFixed(3), m[11].toFixed(3), m[15].toFixed(3), ']');
+
+      console.log('='.repeat(60));
+    }
+
+    // 将对象 world 坐标转换成该对象局部坐标（示例用）
+    function worldToLocalExample(worldVec, obj) {
+      // worldVec: THREE.Vector3
+      // obj: target object
+      const clone = worldVec.clone();
+      obj.worldToLocal(clone);
+      return clone;
+    }
+
+    // expose some helpers to window for convenience
+    window._debug = {
+      findFirstMesh, findNodesWithNonIdentityTransform, logSceneTree, debugPrintCurrent, centerModelToBBox
+    };
+
+  </script>
+</body>
+
+</html>
