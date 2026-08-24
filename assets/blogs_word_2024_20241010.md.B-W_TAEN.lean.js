@@ -1,0 +1,1 @@
+import{_ as e,o as t,c as o}from"./chunks/framework.DhlTfvHe.js";const l=JSON.parse('{"title":"","description":"","frontmatter":{},"headers":[],"relativePath":"blogs/word/2024/20241010.md","filePath":"blogs/word/2024/20241010.md"}'),r={name:"blogs/word/2024/20241010.md"};function a(s,c,n,d,_,p){return t(),o("div")}const m=e(r,[["render",a]]);export{l as __pageData,m as default};
