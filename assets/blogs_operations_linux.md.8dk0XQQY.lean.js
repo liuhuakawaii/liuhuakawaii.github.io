@@ -1,0 +1,1 @@
+import{_ as e,o as t,c as o}from"./chunks/framework.CPwtRLvJ.js";const d=JSON.parse('{"title":"","description":"","frontmatter":{},"headers":[],"relativePath":"blogs/operations/linux.md","filePath":"blogs/operations/linux.md"}'),a={name:"blogs/operations/linux.md"};function n(s,r,i,c,l,p){return t(),o("div")}const m=e(a,[["render",n]]);export{d as __pageData,m as default};
