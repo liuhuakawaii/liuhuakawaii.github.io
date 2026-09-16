@@ -1,0 +1,1655 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PLAN B / C / D + Outer Halo Three.js Effects Demo</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #c9caca;
+      --ink: #202322;
+      --muted: #6f7672;
+      --line: rgba(32, 35, 34, 0.16);
+      --panel: rgba(245, 246, 243, 0.82);
+      --accent: #c8ef11;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100dvh;
+      overflow: hidden;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      letter-spacing: 0;
+    }
+
+    #app {
+      position: fixed;
+      inset: 0;
+    }
+
+    canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+
+    .brand {
+      position: fixed;
+      left: 32px;
+      top: 28px;
+      pointer-events: none;
+      user-select: none;
+    }
+
+    .brand strong {
+      display: block;
+      font-size: 13px;
+      line-height: 1.1;
+    }
+
+    .brand span {
+      display: block;
+      margin-top: 6px;
+      font-size: 10px;
+      color: rgba(32, 35, 34, 0.42);
+      text-transform: uppercase;
+    }
+
+    .watermark {
+      position: fixed;
+      left: -28px;
+      top: 15vh;
+      pointer-events: none;
+      color: rgba(32, 35, 34, 0.07);
+      font-size: clamp(84px, 18vw, 240px);
+      font-weight: 700;
+      line-height: 0.8;
+      letter-spacing: -0.05em;
+      user-select: none;
+      white-space: nowrap;
+    }
+
+    .panel {
+      position: fixed;
+      right: 24px;
+      top: 24px;
+      width: min(360px, calc(100vw - 48px));
+      max-height: calc(100dvh - 48px);
+      overflow: auto;
+      border: 1px solid rgba(255, 255, 255, 0.48);
+      border-radius: 8px;
+      background: var(--panel);
+      box-shadow: 0 18px 50px rgba(35, 39, 36, 0.12);
+      backdrop-filter: blur(18px);
+    }
+
+    .panel header {
+      padding: 18px 18px 12px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .panel h1 {
+      margin: 0;
+      font-size: 15px;
+      line-height: 1.2;
+    }
+
+    .panel p {
+      margin: 7px 0 0;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .section {
+      padding: 16px 18px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .section:last-child {
+      border-bottom: 0;
+    }
+
+    .label {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 8px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: rgba(32, 35, 34, 0.72);
+    }
+
+    .value {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      color: var(--muted);
+      font-weight: 500;
+    }
+
+    .mode-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+
+    button,
+    select,
+    input[type="range"] {
+      font: inherit;
+    }
+
+    button {
+      min-height: 38px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.58);
+      color: var(--ink);
+      cursor: pointer;
+      transition: transform 160ms ease, border-color 160ms ease, background 160ms ease;
+    }
+
+    button:hover {
+      border-color: rgba(32, 35, 34, 0.34);
+      background: rgba(255, 255, 255, 0.76);
+    }
+
+    button:active {
+      transform: translateY(1px);
+    }
+
+    button.is-active {
+      border-color: rgba(200, 239, 17, 0.96);
+      background: rgba(200, 239, 17, 0.18);
+      box-shadow: inset 0 0 0 1px rgba(200, 239, 17, 0.38);
+    }
+
+    .wide-button {
+      width: 100%;
+    }
+
+    select {
+      width: 100%;
+      min-height: 38px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.7);
+      color: var(--ink);
+      padding: 0 10px;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      accent-color: var(--accent);
+    }
+
+    .note {
+      margin-top: 10px;
+      font-size: 12px;
+      line-height: 1.55;
+      color: var(--muted);
+    }
+
+    .legend {
+      position: fixed;
+      left: 32px;
+      bottom: 28px;
+      max-width: min(420px, calc(100vw - 64px));
+      color: rgba(32, 35, 34, 0.58);
+      font-size: 12px;
+      line-height: 1.5;
+      pointer-events: none;
+    }
+
+    @media (max-width: 780px) {
+      body {
+        overflow: auto;
+      }
+
+      #app {
+        position: relative;
+        height: 58dvh;
+      }
+
+      .panel {
+        position: relative;
+        right: auto;
+        top: auto;
+        width: auto;
+        max-height: none;
+        margin: 12px;
+      }
+
+      .legend,
+      .watermark {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="app"></div>
+  <div class="watermark">ROBOT</div>
+  <div class="brand">
+    <strong>PLAN B / C / D + HALO</strong>
+    <span>Selected-part + global silhouette effects</span>
+  </div>
+  <aside class="panel" aria-label="Effect controls">
+    <header>
+      <h1>Three.js 机器人特效 Demo</h1>
+      <p>这个单文件示例保留项目里 B/C/D 的核心思路，并加入全身外轮廓光晕：表面采样粒子、蓝图 overlay、实体 dissolve + 星点重构、screen-space silhouette bloom。</p>
+    </header>
+
+    <section class="section">
+      <div class="label">Effect PLAN</div>
+      <div class="mode-grid">
+        <button type="button" data-mode="B" class="is-active">PLAN B</button>
+        <button type="button" data-mode="C">PLAN C</button>
+        <button type="button" data-mode="D">PLAN D</button>
+      </div>
+      <p class="note" id="mode-note">PLAN B 使用表面采样点生成 Points 粒子层。</p>
+    </section>
+
+    <section class="section">
+      <div class="label">Global outer halo</div>
+      <button type="button" id="halo-toggle" class="wide-button is-active">Halo enabled</button>
+      <p class="note">全身外轮廓光晕独立于 PLAN B/C/D：先渲染整体 silhouette mask，再 blur，最后把淡蓝到浅紫的 bloom 叠回主画面。</p>
+    </section>
+
+    <section class="section">
+      <label class="label" for="halo-spread">Halo spread <span class="value" id="halo-spread-value">1.15</span></label>
+      <input id="halo-spread" type="range" min="0.45" max="2.4" step="0.05" value="1.15">
+      <p class="note">控制色晕向外弥散的范围，本质是 blur 半径倍率。</p>
+    </section>
+
+    <section class="section">
+      <label class="label" for="halo-bloom">Halo bloom <span class="value" id="halo-bloom-value">0.48</span></label>
+      <input id="halo-bloom" type="range" min="0" max="1" step="0.02" value="0.48">
+    </section>
+
+    <section class="section">
+      <label class="label" for="halo-breath">Halo breath <span class="value" id="halo-breath-value">0.20</span></label>
+      <input id="halo-breath" type="range" min="0" max="0.6" step="0.02" value="0.2">
+    </section>
+
+    <section class="section">
+      <label class="label" for="density">Density <span class="value" id="density-value">1.00</span></label>
+      <input id="density" type="range" min="0.25" max="1.8" step="0.05" value="1">
+      <p class="note">改变密度会重建粒子 geometry。真实项目里这类参数要做上限保护。</p>
+    </section>
+
+    <section class="section">
+      <label class="label" for="size">Particle size <span class="value" id="size-value">1.00</span></label>
+      <input id="size" type="range" min="0.4" max="2.2" step="0.05" value="1">
+    </section>
+
+    <section class="section">
+      <label class="label" for="speed">Speed <span class="value" id="speed-value">1.00</span></label>
+      <input id="speed" type="range" min="0.35" max="2.4" step="0.05" value="1">
+    </section>
+
+    <section class="section">
+      <label class="label" for="intensity">Intensity <span class="value" id="intensity-value">1.00</span></label>
+      <input id="intensity" type="range" min="0.2" max="1.8" step="0.05" value="1">
+    </section>
+
+    <section class="section">
+      <label class="label" for="variant">PLAN C Variant</label>
+      <select id="variant">
+        <option value="0">blueprint grid</option>
+        <option value="1">section rings</option>
+        <option value="2">energy pulse</option>
+        <option value="3">filament flow</option>
+        <option value="4">cellular cure</option>
+        <option value="5">spark constellation</option>
+      </select>
+    </section>
+
+    <section class="section">
+      <label class="label" for="solid">PLAN D Solid coverage <span class="value" id="solid-value">0.92</span></label>
+      <input id="solid" type="range" min="0" max="1" step="0.02" value="0.92">
+      <p class="note">实体保留度越低，越接近完全粒子化；越高，实体表面保留更多。</p>
+    </section>
+  </aside>
+  <div class="legend">拖动视角查看效果。鼠标靠近模型表面时，PLAN B 会出现局部流动和朝相机拉近的放大感；全身光晕会始终沿整体外轮廓柔和散开。</div>
+
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://unpkg.com/three@0.181.0/build/three.module.js",
+        "three/addons/": "https://unpkg.com/three@0.181.0/examples/jsm/"
+      }
+    }
+  </script>
+  <script type="module">
+    import * as THREE from "three";
+    import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+
+    const container = document.querySelector("#app");
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0xc9caca);
+
+    const camera = new THREE.PerspectiveCamera(28, 1, 0.1, 30);
+    camera.position.set(0.86, 0.62, 2.6);
+
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    renderer.shadowMap.enabled = true;
+    renderer.outputColorSpace = THREE.SRGBColorSpace;
+    container.appendChild(renderer.domElement);
+    const clock = new THREE.Clock();
+
+    const controls = new OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+    controls.target.set(0, 0.18, 0);
+    controls.minDistance = 1.25;
+    controls.maxDistance = 4.5;
+
+    scene.add(new THREE.HemisphereLight(0xffffff, 0x8b918b, 1.65));
+    const keyLight = new THREE.DirectionalLight(0xffffff, 2.25);
+    keyLight.position.set(2.8, 3.2, 2.4);
+    keyLight.castShadow = true;
+    scene.add(keyLight);
+
+    const fillLight = new THREE.DirectionalLight(0xcfe8ff, 0.82);
+    fillLight.position.set(-2.4, 1.2, -1.6);
+    scene.add(fillLight);
+
+    const floor = new THREE.Mesh(
+      new THREE.CircleGeometry(1.15, 96),
+      new THREE.MeshBasicMaterial({ color: 0xbfc1be, transparent: true, opacity: 0.24 })
+    );
+    floor.rotation.x = -Math.PI * 0.5;
+    floor.position.y = -0.58;
+    scene.add(floor);
+
+    const baseMaterial = new THREE.MeshStandardMaterial({
+      color: 0xf1f2ed,
+      roughness: 0.58,
+      metalness: 0.02
+    });
+
+    const darkMaterial = new THREE.MeshStandardMaterial({
+      color: 0x252827,
+      roughness: 0.46,
+      metalness: 0.08
+    });
+
+    const meshes = createDemoPart();
+    meshes.forEach((mesh) => scene.add(mesh));
+    meshes.forEach((mesh) => {
+      mesh.userData.baseMaterial = mesh.material;
+    });
+
+    const selectionFrame = createSelectionFrame();
+    scene.add(selectionFrame);
+
+    const pointer = new THREE.Vector2(9, 9);
+    const raycaster = new THREE.Raycaster();
+    const hoverPoint = new THREE.Vector3(99, 99, 99);
+    const hoverDirection = new THREE.Vector3(1, 0, 0);
+    const previousHoverPoint = new THREE.Vector3();
+    let hasPreviousHoverPoint = false;
+    let hoverStrength = 0;
+    let mode = "B";
+    let elapsed = 0;
+    let buildElapsed = 0;
+    let currentDensity = 1;
+    let currentSize = 1;
+    let currentSpeed = 1;
+    let currentIntensity = 1;
+    let currentVariant = 0;
+    let currentSolidCoverage = 0.92;
+    let haloEnabled = true;
+    let currentHaloSpread = 1.15;
+    let currentHaloBloom = 0.48;
+    let currentHaloBreath = 0.2;
+
+    const buildAxis = new THREE.Vector3(0, 1, 0);
+    const buildRange = new THREE.Vector2(0, 1);
+    updatePartBuildRange();
+
+    const surfaceParticleMaterial = createSurfaceParticleMaterial();
+    const reconstructParticleMaterial = createReconstructParticleMaterial();
+    const blueprintMaterial = createBlueprintMaterial();
+    const reconstructSolidMaterial = createReconstructSolidMaterial();
+    const outerHaloMaskScene = new THREE.Scene();
+    const outerHaloPassScene = new THREE.Scene();
+    const outerHaloPassCamera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+    const outerHaloMaskMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff });
+    const outerHaloBlurMaterial = createOuterHaloBlurMaterial();
+    const outerHaloCompositeMaterial = createOuterHaloCompositeMaterial();
+    const outerHaloQuad = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), outerHaloBlurMaterial);
+    const outerHaloMaskMeshes = createOuterHaloMaskMeshes(meshes);
+    let outerHaloMaskTarget;
+    let outerHaloBlurTarget;
+    let outerHaloTempTarget;
+    outerHaloPassScene.add(outerHaloQuad);
+
+    let surfaceLayers = [];
+    let reconstructLayers = [];
+    let blueprintLayers = [];
+
+    rebuildParticleLayers();
+    rebuildBlueprintLayers();
+    setMode("B");
+    bindUi();
+    bindPointer();
+    resize();
+    renderer.setAnimationLoop(tick);
+    window.addEventListener("resize", resize);
+
+    function createDemoPart() {
+      const head = new THREE.Mesh(
+        new THREE.SphereGeometry(0.42, 72, 48),
+        baseMaterial.clone()
+      );
+      head.name = "soft head shell";
+      head.scale.set(0.82, 1.08, 0.66);
+      head.position.set(0, 0.26, 0);
+      head.castShadow = true;
+      head.receiveShadow = true;
+
+      const face = new THREE.Mesh(
+        new THREE.CapsuleGeometry(0.18, 0.32, 16, 32),
+        darkMaterial.clone()
+      );
+      face.name = "front face insert";
+      face.scale.set(0.72, 1.06, 0.18);
+      face.rotation.z = Math.PI * 0.5;
+      face.position.set(-0.24, 0.32, 0.33);
+      face.castShadow = true;
+
+      const collar = new THREE.Mesh(
+        new THREE.TorusGeometry(0.29, 0.045, 18, 96, Math.PI * 1.45),
+        baseMaterial.clone()
+      );
+      collar.name = "lower collar";
+      collar.rotation.x = Math.PI * 0.52;
+      collar.rotation.z = -0.18;
+      collar.position.set(0.02, -0.24, 0.02);
+      collar.castShadow = true;
+      collar.receiveShadow = true;
+
+      return [head, face, collar];
+    }
+
+    function createSelectionFrame() {
+      const group = new THREE.Group();
+      const material = new THREE.LineBasicMaterial({
+        color: 0xc8ef11,
+        transparent: true,
+        opacity: 0.86
+      });
+      const corners = [
+        [-0.47, 0.76, 0.42, 1, -1],
+        [0.47, 0.76, 0.42, -1, -1],
+        [-0.47, -0.34, 0.42, 1, 1],
+        [0.47, -0.34, 0.42, -1, 1]
+      ];
+
+      corners.forEach(([x, y, z, sx, sy]) => {
+        const points = [
+          new THREE.Vector3(x, y, z),
+          new THREE.Vector3(x + sx * 0.08, y, z),
+          new THREE.Vector3(x, y, z),
+          new THREE.Vector3(x, y + sy * 0.08, z)
+        ];
+        group.add(new THREE.LineSegments(new THREE.BufferGeometry().setFromPoints(points), material));
+      });
+
+      return group;
+    }
+
+    function createOuterHaloMaskMeshes(sourceMeshes) {
+      return sourceMeshes.map((sourceMesh) => {
+        const maskMesh = new THREE.Mesh(sourceMesh.geometry, outerHaloMaskMaterial);
+        maskMesh.matrixAutoUpdate = false;
+        maskMesh.frustumCulled = false;
+        maskMesh.renderOrder = -10;
+        outerHaloMaskScene.add(maskMesh);
+        return { sourceMesh, maskMesh };
+      });
+    }
+
+    function createOuterHaloBlurMaterial() {
+      return new THREE.ShaderMaterial({
+        depthTest: false,
+        depthWrite: false,
+        uniforms: {
+          tDiffuse: { value: null },
+          uTexelSize: { value: new THREE.Vector2(1, 1) },
+          uDirection: { value: new THREE.Vector2(1, 0) },
+          uRadius: { value: 1 }
+        },
+        vertexShader: `
+          varying vec2 vUv;
+
+          void main() {
+            vUv = uv;
+            gl_Position = vec4(position.xy, 0.0, 1.0);
+          }
+        `,
+        fragmentShader: `
+          precision highp float;
+
+          uniform sampler2D tDiffuse;
+          uniform vec2 uTexelSize;
+          uniform vec2 uDirection;
+          uniform float uRadius;
+
+          varying vec2 vUv;
+
+          void main() {
+            vec2 stepUv = uDirection * uTexelSize * uRadius;
+            float value = texture2D(tDiffuse, vUv).r * 0.227027;
+            value += texture2D(tDiffuse, vUv + stepUv * 1.384615).r * 0.316216;
+            value += texture2D(tDiffuse, vUv - stepUv * 1.384615).r * 0.316216;
+            value += texture2D(tDiffuse, vUv + stepUv * 3.230769).r * 0.070270;
+            value += texture2D(tDiffuse, vUv - stepUv * 3.230769).r * 0.070270;
+            gl_FragColor = vec4(vec3(value), 1.0);
+          }
+        `
+      });
+    }
+
+    function createOuterHaloCompositeMaterial() {
+      return new THREE.ShaderMaterial({
+        transparent: true,
+        blending: THREE.AdditiveBlending,
+        depthTest: false,
+        depthWrite: false,
+        uniforms: {
+          uMask: { value: null },
+          uBlur: { value: null },
+          uTime: { value: 0 },
+          uIntensity: { value: 1.18 },
+          uOpacity: { value: 0.9 },
+          uBloomStrength: { value: 0.48 },
+          uBreathIntensity: { value: 0.2 },
+          uLeftOuterColor: { value: new THREE.Color("#DDFBFF") },
+          uLeftColor: { value: new THREE.Color("#D1E4FF") },
+          uRightColor: { value: new THREE.Color("#DED0FF") },
+          uRightOuterColor: { value: new THREE.Color("#C4A8FF") },
+          uHighlightColor: { value: new THREE.Color("#FFFFFF") }
+        },
+        vertexShader: `
+          varying vec2 vUv;
+
+          void main() {
+            vUv = uv;
+            gl_Position = vec4(position.xy, 0.0, 1.0);
+          }
+        `,
+        fragmentShader: `
+          precision highp float;
+
+          uniform sampler2D uMask;
+          uniform sampler2D uBlur;
+          uniform float uTime;
+          uniform float uIntensity;
+          uniform float uOpacity;
+          uniform float uBloomStrength;
+          uniform float uBreathIntensity;
+          uniform vec3 uLeftOuterColor;
+          uniform vec3 uLeftColor;
+          uniform vec3 uRightColor;
+          uniform vec3 uRightOuterColor;
+          uniform vec3 uHighlightColor;
+
+          varying vec2 vUv;
+
+          vec3 getHaloGradient(float x, float glowDepth) {
+            vec3 leftColor = mix(uLeftOuterColor, uLeftColor, smoothstep(0.0, 0.36, x));
+            vec3 rightColor = mix(uRightColor, uRightOuterColor, smoothstep(0.64, 1.0, x));
+            vec3 middleColor = mix(uLeftColor, uRightColor, smoothstep(0.34, 0.68, x));
+            vec3 sideColor = mix(leftColor, rightColor, smoothstep(0.44, 0.72, x));
+            return mix(middleColor, sideColor, glowDepth);
+          }
+
+          void main() {
+            float insideMask = texture2D(uMask, vUv).r;
+            float blurredMask = texture2D(uBlur, vUv).r;
+            float outsideMask = 1.0 - insideMask;
+            float exteriorGlow = max(blurredMask - insideMask * 0.86, 0.0) * outsideMask;
+            float bloomCore = pow(clamp(exteriorGlow, 0.0, 1.0), 1.24);
+            float airyGlow = pow(clamp(blurredMask * outsideMask, 0.0, 1.0), 2.0) * 0.28;
+            float glow = clamp(bloomCore + airyGlow, 0.0, 1.0);
+            float breath = 1.0 + sin(uTime * 6.2831853 * 0.34) * uBreathIntensity;
+            vec3 haloColor = getHaloGradient(vUv.x, airyGlow + bloomCore);
+            float bloomLift = smoothstep(0.06, 0.62, glow);
+            vec3 color = mix(haloColor, uHighlightColor, bloomLift * uBloomStrength);
+            float alpha = glow * uOpacity * uIntensity * breath;
+
+            gl_FragColor = vec4(color * alpha, alpha);
+          }
+        `
+      });
+    }
+
+    function createSurfaceParticleMaterial() {
+      return new THREE.ShaderMaterial({
+        transparent: true,
+        depthTest: true,
+        depthWrite: false,
+        uniforms: {
+          uTime: { value: 0 },
+          uPixelRatio: { value: Math.min(window.devicePixelRatio || 1, 2) },
+          uPointSize: { value: 0.012 },
+          uSurfaceOffset: { value: 0.005 },
+          uDrift: { value: 0.012 },
+          uBuildProgress: { value: 0 },
+          uBuildAxis: { value: buildAxis },
+          uBuildRange: { value: buildRange },
+          uHoverPoint: { value: hoverPoint },
+          uHoverDirection: { value: hoverDirection },
+          uHoverStrength: { value: 0 },
+          uHoverRadius: { value: 0.34 },
+          uLightProgress: { value: 0 },
+          uLightStrength: { value: 0 },
+          uIntensity: { value: 1 },
+          uPrimaryColor: { value: new THREE.Color(0xb8f5c4) },
+          uAccentColor: { value: new THREE.Color(0xc8ef11) },
+          uSecondaryColor: { value: new THREE.Color(0xffffff) }
+        },
+        vertexShader: `
+          precision highp float;
+
+          attribute vec3 aSurfaceNormal;
+          attribute float aSize;
+          attribute vec4 aSeed;
+
+          uniform float uTime;
+          uniform float uPixelRatio;
+          uniform float uPointSize;
+          uniform float uSurfaceOffset;
+          uniform float uDrift;
+          uniform float uBuildProgress;
+          uniform vec3 uBuildAxis;
+          uniform vec2 uBuildRange;
+          uniform vec3 uHoverPoint;
+          uniform vec3 uHoverDirection;
+          uniform float uHoverStrength;
+          uniform float uHoverRadius;
+          uniform float uLightProgress;
+          uniform float uLightStrength;
+
+          varying float vAlpha;
+          varying float vBuildFront;
+          varying float vHover;
+          varying float vLight;
+          varying float vSeed;
+
+          vec3 safeNormalize(vec3 value, vec3 fallback) {
+            float lenSq = dot(value, value);
+            return lenSq > 0.000001 ? value * inversesqrt(lenSq) : fallback;
+          }
+
+          float wrappedDistance(float value, float target) {
+            float directDistance = abs(value - target);
+            return min(directDistance, min(abs(value - target - 1.0), abs(value - target + 1.0)));
+          }
+
+          void main() {
+            vec3 worldBase = (modelMatrix * vec4(position, 1.0)).xyz;
+            vec3 worldNormal = safeNormalize(mat3(modelMatrix) * aSurfaceNormal, vec3(0.0, 1.0, 0.0));
+            vec3 stableAxis = abs(worldNormal.y) < 0.86 ? vec3(0.0, 1.0, 0.0) : vec3(1.0, 0.0, 0.0);
+            vec3 tangentA = safeNormalize(cross(worldNormal, stableAxis), vec3(1.0, 0.0, 0.0));
+            vec3 tangentB = safeNormalize(cross(worldNormal, tangentA), vec3(0.0, 0.0, 1.0));
+
+            float rangeSize = max(uBuildRange.y - uBuildRange.x, 0.0001);
+            float buildCoord = clamp((dot(worldBase, uBuildAxis) - uBuildRange.x) / rangeSize, 0.0, 1.0);
+            float front = mix(-0.18, 1.18, clamp(uBuildProgress, 0.0, 1.0));
+            float distanceToFront = buildCoord - front;
+            float attachAmount = 1.0 - smoothstep(-0.08, 0.2, distanceToFront);
+            float looseAmount = 1.0 - attachAmount;
+            float frontBand = 1.0 - smoothstep(0.0, 0.16, abs(distanceToFront));
+            float light = uLightStrength * (1.0 - smoothstep(0.0, 0.11, wrappedDistance(buildCoord, uLightProgress)));
+
+            float phaseA = aSeed.x * 6.2831853;
+            float phaseB = aSeed.y * 6.2831853;
+            float breath = 0.5 + 0.5 * sin(uTime * mix(0.48, 1.12, aSeed.z) + phaseA);
+            float driftA = sin(uTime * mix(0.5, 1.25, aSeed.w) + phaseA);
+            float driftB = cos(uTime * mix(0.44, 1.1, aSeed.z) + phaseB);
+
+            vec3 hoverVector = worldBase - uHoverPoint;
+            float hoverDistance = length(hoverVector);
+            vec3 hoverRadial = safeNormalize(hoverVector, uHoverDirection);
+            vec3 hoverFlow = safeNormalize(uHoverDirection - worldNormal * dot(uHoverDirection, worldNormal), tangentA);
+            float forwardMask = smoothstep(-0.35, 0.82, dot(hoverRadial, hoverFlow));
+            float hover = uHoverStrength * (1.0 - smoothstep(0.0, uHoverRadius, hoverDistance));
+            float hoverCore = hover * hover;
+            vec3 viewPull = safeNormalize(cameraPosition - worldBase, worldNormal);
+
+            vec3 worldPos = worldBase;
+            worldPos += worldNormal * (uSurfaceOffset + looseAmount * 0.052 + frontBand * 0.016);
+            worldPos += (tangentA * driftA + tangentB * driftB) * (uDrift * (0.42 + looseAmount * 1.8));
+            worldPos += worldNormal * hoverCore * 0.025;
+            worldPos += hoverFlow * hoverCore * (0.05 + forwardMask * 0.035);
+            worldPos += viewPull * hoverCore * (0.14 + forwardMask * 0.05);
+            worldPos += worldNormal * light * 0.008;
+
+            vec4 mvPosition = viewMatrix * vec4(worldPos, 1.0);
+            float depthScale = 280.0 / max(0.2, -mvPosition.z);
+            float pointScale = mix(0.66, 1.0, attachAmount) + frontBand * 0.42 + hoverCore * 0.8 + light * 0.24;
+
+            gl_Position = projectionMatrix * mvPosition;
+            gl_PointSize = aSize * uPointSize * depthScale * uPixelRatio * pointScale;
+
+            vAlpha = mix(0.24, 0.86, attachAmount) * (0.72 + breath * 0.22) * (1.0 + hover * 0.32 + light * 0.28);
+            vBuildFront = frontBand;
+            vHover = hover;
+            vLight = light;
+            vSeed = aSeed.x;
+          }
+        `,
+        fragmentShader: `
+          precision highp float;
+
+          uniform float uIntensity;
+          uniform vec3 uPrimaryColor;
+          uniform vec3 uAccentColor;
+          uniform vec3 uSecondaryColor;
+
+          varying float vAlpha;
+          varying float vBuildFront;
+          varying float vHover;
+          varying float vLight;
+          varying float vSeed;
+
+          void main() {
+            vec2 coord = gl_PointCoord * 2.0 - 1.0;
+            float distanceToCenter = length(coord);
+            if (distanceToCenter > 1.0) discard;
+
+            float core = 1.0 - smoothstep(0.0, 0.35, distanceToCenter);
+            float edge = 1.0 - smoothstep(0.28, 1.0, distanceToCenter);
+            float grain = 0.92 + 0.08 * sin(vSeed * 47.31);
+            vec3 color = mix(uPrimaryColor, uSecondaryColor, core * 0.56);
+            color = mix(color, uAccentColor, clamp(vBuildFront * 0.7 + vLight * 0.8, 0.0, 1.0));
+            color = mix(color, uSecondaryColor, clamp(vHover * 0.5, 0.0, 1.0));
+
+            float alpha = (core * 0.52 + edge * 0.42) * vAlpha * grain * uIntensity;
+            gl_FragColor = vec4(color, clamp(alpha, 0.0, 0.92));
+          }
+        `
+      });
+    }
+
+    function createBlueprintMaterial() {
+      return new THREE.ShaderMaterial({
+        transparent: true,
+        depthTest: true,
+        depthWrite: false,
+        side: THREE.FrontSide,
+        polygonOffset: true,
+        polygonOffsetFactor: -2,
+        polygonOffsetUnits: -2,
+        uniforms: {
+          uTime: { value: 0 },
+          uBuildAxis: { value: buildAxis },
+          uBuildRange: { value: buildRange },
+          uBuildProgress: { value: 0 },
+          uVariant: { value: 0 },
+          uOpacity: { value: 1 },
+          uIntensity: { value: 1 },
+          uGridStrength: { value: 1 },
+          uRimStrength: { value: 1 },
+          uPrimaryColor: { value: new THREE.Color(0xb8f5c4) },
+          uAccentColor: { value: new THREE.Color(0xc8ef11) }
+        },
+        vertexShader: `
+          precision highp float;
+
+          uniform vec3 uBuildAxis;
+          uniform vec2 uBuildRange;
+
+          varying vec3 vWorldPos;
+          varying vec3 vNormalW;
+          varying vec3 vViewDir;
+          varying float vCoord;
+
+          vec3 safeNormalize(vec3 value, vec3 fallback) {
+            float lenSq = dot(value, value);
+            return lenSq > 0.000001 ? value * inversesqrt(lenSq) : fallback;
+          }
+
+          void main() {
+            vec4 worldPos = modelMatrix * vec4(position, 1.0);
+            float rangeSize = max(uBuildRange.y - uBuildRange.x, 0.0001);
+
+            vWorldPos = worldPos.xyz;
+            vNormalW = safeNormalize(mat3(modelMatrix) * normal, vec3(0.0, 1.0, 0.0));
+            vViewDir = safeNormalize(cameraPosition - worldPos.xyz, vec3(0.0, 0.0, 1.0));
+            vCoord = clamp((dot(worldPos.xyz, uBuildAxis) - uBuildRange.x) / rangeSize, 0.0, 1.0);
+
+            gl_Position = projectionMatrix * viewMatrix * worldPos;
+          }
+        `,
+        fragmentShader: `
+          precision highp float;
+
+          uniform float uTime;
+          uniform float uBuildProgress;
+          uniform float uVariant;
+          uniform float uOpacity;
+          uniform float uIntensity;
+          uniform float uGridStrength;
+          uniform float uRimStrength;
+          uniform vec3 uPrimaryColor;
+          uniform vec3 uAccentColor;
+
+          varying vec3 vWorldPos;
+          varying vec3 vNormalW;
+          varying vec3 vViewDir;
+          varying float vCoord;
+
+          float hash31(vec3 value) {
+            value = fract(value * 0.1031);
+            value += dot(value, value.yzx + 33.33);
+            return fract((value.x + value.y) * value.z);
+          }
+
+          float wrappedDistance(float value, float target) {
+            float directDistance = abs(value - target);
+            return min(directDistance, min(abs(value - target - 1.0), abs(value - target + 1.0)));
+          }
+
+          float movingBand(float coord, float progress, float width) {
+            return 1.0 - smoothstep(0.0, width, wrappedDistance(coord, progress));
+          }
+
+          float triplanarGrid(vec3 worldPos, vec3 normalW, float scale, float thickness) {
+            vec3 grid = abs(fract(worldPos * scale) - 0.5);
+            vec3 normalAxis = abs(normalW);
+            float line = min(grid.x, grid.y);
+            if (normalAxis.x > normalAxis.y && normalAxis.x > normalAxis.z) {
+              line = min(grid.y, grid.z);
+            } else if (normalAxis.y > normalAxis.z) {
+              line = min(grid.x, grid.z);
+            }
+            return 1.0 - smoothstep(thickness, thickness + max(fwidth(line), 0.0001), line);
+          }
+
+          void main() {
+            vec3 normalW = normalize(vNormalW);
+            vec3 viewDir = normalize(vViewDir);
+            float rim = pow(1.0 - clamp(dot(normalW, viewDir), 0.0, 1.0), 2.2) * uRimStrength;
+            float grid = triplanarGrid(vWorldPos, normalW, 36.0, 0.018) * uGridStrength;
+            float noise = hash31(floor(vWorldPos * 18.0));
+            float front = mix(-0.12, 1.14, clamp(uBuildProgress, 0.0, 1.0));
+            float buildGate = smoothstep(-0.08, 0.18, front - vCoord);
+            float buildFront = 1.0 - smoothstep(0.0, 0.11, abs(vCoord - front));
+            float bandA = movingBand(vCoord, fract(uTime * 0.18), 0.09);
+            float bandB = movingBand(vCoord, fract(uTime * 0.27 + 0.37), 0.14);
+            float pattern = grid * 0.18 + rim * 0.22 + buildFront * 0.58 + bandA * 0.2;
+
+            if (uVariant > 4.5) {
+              float spark = smoothstep(0.88, 0.998, hash31(floor(vWorldPos * 42.0)));
+              pattern = rim * 0.16 + spark * (0.36 + 0.28 * sin(uTime * 6.0 + noise * 18.0)) + buildFront * 0.34 + bandB * 0.2;
+            } else if (uVariant > 3.5) {
+              float cell = triplanarGrid(vWorldPos, normalW, 20.0, 0.028);
+              pattern = rim * 0.14 + cell * 0.34 + bandA * 0.16 + buildFront * 0.25;
+            } else if (uVariant > 2.5) {
+              float flow = smoothstep(0.82, 0.995, 0.5 + 0.5 * sin((vWorldPos.x * 12.0 + vWorldPos.y * 8.0 + vCoord * 9.0 - uTime * 1.4) * 6.2831853));
+              pattern = rim * 0.16 + flow * 0.32 + bandB * 0.28;
+            } else if (uVariant > 1.5) {
+              pattern = rim * 0.24 + buildFront * 0.36 + bandA * 0.42 + bandB * 0.24 + grid * 0.08;
+            } else if (uVariant > 0.5) {
+              float rings = smoothstep(0.88, 0.995, 0.5 + 0.5 * cos((vCoord * 28.0 - uTime * 2.3) * 6.2831853));
+              pattern = rim * 0.18 + rings * 0.22 + bandA * 0.44 + grid * 0.08;
+            }
+
+            pattern *= 0.28 + buildGate * 0.82 + noise * 0.06;
+            vec3 color = mix(uPrimaryColor, uAccentColor, clamp(buildFront + bandA * 0.45 + bandB * 0.35, 0.0, 1.0));
+            float alpha = pattern * uOpacity * uIntensity;
+            if (alpha < 0.01) discard;
+            gl_FragColor = vec4(color, clamp(alpha, 0.0, 0.78));
+          }
+        `
+      });
+    }
+
+    function createReconstructParticleMaterial() {
+      return new THREE.ShaderMaterial({
+        transparent: true,
+        depthTest: true,
+        depthWrite: false,
+        blending: THREE.AdditiveBlending,
+        uniforms: {
+          uTime: { value: 0 },
+          uPixelRatio: { value: Math.min(window.devicePixelRatio || 1, 2) },
+          uPointSize: { value: 0.012 },
+          uSurfaceOffset: { value: 0.004 },
+          uDrift: { value: 0.018 },
+          uCycleDuration: { value: 4.8 },
+          uFrontSoftness: { value: 0.045 },
+          uFrontWidth: { value: 0.12 },
+          uBuildAxis: { value: buildAxis },
+          uBuildRange: { value: buildRange },
+          uIntensity: { value: 1 },
+          uPrimaryColor: { value: new THREE.Color(0xb8f5c4) },
+          uAccentColor: { value: new THREE.Color(0xc8ef11) },
+          uSecondaryColor: { value: new THREE.Color(0xffffff) }
+        },
+        vertexShader: `
+          precision highp float;
+
+          attribute vec3 aSurfaceNormal;
+          attribute float aSize;
+          attribute vec4 aSeed;
+
+          uniform float uTime;
+          uniform float uPixelRatio;
+          uniform float uPointSize;
+          uniform float uSurfaceOffset;
+          uniform float uDrift;
+          uniform float uCycleDuration;
+          uniform float uFrontSoftness;
+          uniform float uFrontWidth;
+          uniform vec3 uBuildAxis;
+          uniform vec2 uBuildRange;
+
+          varying float vAlpha;
+          varying float vParticleMask;
+          varying float vFront;
+          varying float vSpark;
+          varying float vSeed;
+
+          struct ReconstructState {
+            float particleMask;
+            float solidMask;
+            float frontBand;
+          };
+
+          vec3 safeNormalize(vec3 value, vec3 fallback) {
+            float lenSq = dot(value, value);
+            return lenSq > 0.000001 ? value * inversesqrt(lenSq) : fallback;
+          }
+
+          float easeValue(float value) {
+            float t = clamp(value, 0.0, 1.0);
+            return t * t * (3.0 - 2.0 * t);
+          }
+
+          float progressWindow(float cycle, float start, float end) {
+            return easeValue((cycle - start) / max(end - start, 0.0001));
+          }
+
+          ReconstructState computeState(float coord) {
+            float cycle = fract(uTime / max(uCycleDuration, 0.001));
+            float dissolveProgress = progressWindow(cycle, 0.03, 0.30);
+            float rebuildProgress = progressWindow(cycle, 0.53, 0.82);
+            float dissolveFront = mix(-uFrontSoftness * 2.0, 1.0 + uFrontSoftness, dissolveProgress);
+            float rebuildFront = mix(-uFrontSoftness * 2.0, 1.0 + uFrontSoftness, rebuildProgress);
+            float dissolveMask = 1.0 - smoothstep(dissolveFront - uFrontSoftness, dissolveFront + uFrontSoftness, coord);
+            float rebuiltMask = 1.0 - smoothstep(rebuildFront - uFrontSoftness, rebuildFront + uFrontSoftness, coord);
+            float rebuildBlend = smoothstep(0.48, 0.55, cycle);
+            float particleMask = mix(dissolveMask, 1.0 - rebuiltMask, rebuildBlend);
+            float dissolveActive = 1.0 - smoothstep(0.31, 0.46, cycle);
+            float rebuildActive = smoothstep(0.49, 0.56, cycle) * (1.0 - smoothstep(0.82, 0.94, cycle));
+            float dissolveBand = (1.0 - smoothstep(0.0, uFrontWidth, abs(coord - dissolveFront))) * dissolveActive;
+            float rebuildBand = (1.0 - smoothstep(0.0, uFrontWidth, abs(coord - rebuildFront))) * rebuildActive;
+            ReconstructState state;
+            state.particleMask = clamp(particleMask, 0.0, 1.0);
+            state.solidMask = 1.0 - state.particleMask;
+            state.frontBand = max(dissolveBand, rebuildBand);
+            return state;
+          }
+
+          void main() {
+            vec3 worldBase = (modelMatrix * vec4(position, 1.0)).xyz;
+            vec3 worldNormal = safeNormalize(mat3(modelMatrix) * aSurfaceNormal, vec3(0.0, 1.0, 0.0));
+            vec3 stableAxis = abs(worldNormal.y) < 0.86 ? vec3(0.0, 1.0, 0.0) : vec3(1.0, 0.0, 0.0);
+            vec3 tangentA = safeNormalize(cross(worldNormal, stableAxis), vec3(1.0, 0.0, 0.0));
+            vec3 tangentB = safeNormalize(cross(worldNormal, tangentA), vec3(0.0, 0.0, 1.0));
+            float rangeSize = max(uBuildRange.y - uBuildRange.x, 0.0001);
+            float coord = clamp((dot(worldBase, uBuildAxis) - uBuildRange.x) / rangeSize, 0.0, 1.0);
+            ReconstructState state = computeState(coord);
+
+            float phaseA = aSeed.x * 6.2831853;
+            float phaseB = aSeed.y * 6.2831853;
+            float shimmer = 0.5 + 0.5 * sin(uTime * mix(0.7, 1.65, aSeed.z) + phaseA);
+            float driftA = sin(uTime * mix(0.32, 0.88, aSeed.w) + phaseA);
+            float driftB = cos(uTime * mix(0.36, 0.92, aSeed.z) + phaseB);
+            float frontSpark = state.frontBand * (0.75 + shimmer * 0.5);
+
+            vec3 worldPos = worldBase;
+            worldPos += worldNormal * (uSurfaceOffset * state.particleMask);
+            worldPos += (tangentA * driftA + tangentB * driftB) * uDrift * state.particleMask * (0.36 + aSeed.z * 0.32);
+
+            vec4 mvPosition = viewMatrix * vec4(worldPos, 1.0);
+            float depthScale = 280.0 / max(0.2, -mvPosition.z);
+            float particleScale = mix(0.72, 0.98, state.particleMask);
+            float shimmerScale = 0.88 + shimmer * 0.16 + frontSpark * 0.28;
+
+            gl_Position = projectionMatrix * mvPosition;
+            gl_PointSize = aSize * uPointSize * depthScale * uPixelRatio * particleScale * shimmerScale;
+
+            vParticleMask = state.particleMask;
+            vFront = state.frontBand;
+            vSpark = shimmer;
+            vSeed = aSeed.x;
+            vAlpha = state.particleMask * (0.62 + shimmer * 0.3) + state.frontBand * 0.92;
+          }
+        `,
+        fragmentShader: `
+          precision highp float;
+
+          uniform float uIntensity;
+          uniform vec3 uPrimaryColor;
+          uniform vec3 uAccentColor;
+          uniform vec3 uSecondaryColor;
+
+          varying float vAlpha;
+          varying float vParticleMask;
+          varying float vFront;
+          varying float vSpark;
+          varying float vSeed;
+
+          void main() {
+            vec2 coord = gl_PointCoord * 2.0 - 1.0;
+            float distanceToCenter = length(coord);
+            if (distanceToCenter > 1.0 || vAlpha < 0.01) discard;
+
+            float core = 1.0 - smoothstep(0.0, 0.22, distanceToCenter);
+            float body = 1.0 - smoothstep(0.14, 0.62, distanceToCenter);
+            float halo = 1.0 - smoothstep(0.24, 1.0, distanceToCenter);
+            float rayX = (1.0 - smoothstep(0.0, 0.06, abs(coord.y))) * (1.0 - smoothstep(0.12, 0.98, abs(coord.x)));
+            float rayY = (1.0 - smoothstep(0.0, 0.06, abs(coord.x))) * (1.0 - smoothstep(0.12, 0.98, abs(coord.y)));
+            float ray = max(rayX, rayY) * (0.16 + vFront * 0.46);
+            float grain = 0.9 + 0.1 * sin(vSeed * 49.31);
+            float sparkle = mix(0.78, 1.18, vSpark);
+            float alpha = (core * 0.78 + body * 0.34 + halo * 0.16 + ray * 0.2) * vAlpha * grain * sparkle * uIntensity;
+            vec3 color = mix(uPrimaryColor, uSecondaryColor, clamp(vParticleMask * (0.76 + vSpark * 0.32), 0.0, 1.0));
+            color = mix(color, uAccentColor, clamp(vFront * 0.95 + core * 0.1, 0.0, 1.0));
+
+            gl_FragColor = vec4(color, clamp(alpha, 0.0, 1.0));
+          }
+        `
+      });
+    }
+
+    function createReconstructSolidMaterial() {
+      return new THREE.ShaderMaterial({
+        transparent: false,
+        depthTest: true,
+        depthWrite: true,
+        uniforms: {
+          uTime: { value: 0 },
+          uCycleDuration: { value: 4.8 },
+          uFrontSoftness: { value: 0.045 },
+          uFrontWidth: { value: 0.12 },
+          uBuildAxis: { value: buildAxis },
+          uBuildRange: { value: buildRange },
+          uSolidCoverage: { value: currentSolidCoverage },
+          uBaseColor: { value: new THREE.Color(0xf1f2ed) },
+          uDarkColor: { value: new THREE.Color(0x252827) },
+          uAccentColor: { value: new THREE.Color(0xc8ef11) }
+        },
+        vertexShader: `
+          precision highp float;
+
+          uniform vec3 uBuildAxis;
+          uniform vec2 uBuildRange;
+
+          varying vec3 vWorldPos;
+          varying vec3 vNormalW;
+          varying float vCoord;
+
+          void main() {
+            vec4 worldPos = modelMatrix * vec4(position, 1.0);
+            float rangeSize = max(uBuildRange.y - uBuildRange.x, 0.0001);
+            vWorldPos = worldPos.xyz;
+            vNormalW = normalize(mat3(modelMatrix) * normal);
+            vCoord = clamp((dot(worldPos.xyz, uBuildAxis) - uBuildRange.x) / rangeSize, 0.0, 1.0);
+            gl_Position = projectionMatrix * viewMatrix * worldPos;
+          }
+        `,
+        fragmentShader: `
+          precision highp float;
+
+          uniform float uTime;
+          uniform float uCycleDuration;
+          uniform float uFrontSoftness;
+          uniform float uFrontWidth;
+          uniform float uSolidCoverage;
+          uniform vec3 uBaseColor;
+          uniform vec3 uDarkColor;
+          uniform vec3 uAccentColor;
+
+          varying vec3 vWorldPos;
+          varying vec3 vNormalW;
+          varying float vCoord;
+
+          struct ReconstructState {
+            float particleMask;
+            float solidMask;
+            float frontBand;
+          };
+
+          float easeValue(float value) {
+            float t = clamp(value, 0.0, 1.0);
+            return t * t * (3.0 - 2.0 * t);
+          }
+
+          float progressWindow(float cycle, float start, float end) {
+            return easeValue((cycle - start) / max(end - start, 0.0001));
+          }
+
+          ReconstructState computeState(float coord) {
+            float cycle = fract(uTime / max(uCycleDuration, 0.001));
+            float dissolveProgress = progressWindow(cycle, 0.03, 0.30);
+            float rebuildProgress = progressWindow(cycle, 0.53, 0.82);
+            float dissolveFront = mix(-uFrontSoftness * 2.0, 1.0 + uFrontSoftness, dissolveProgress);
+            float rebuildFront = mix(-uFrontSoftness * 2.0, 1.0 + uFrontSoftness, rebuildProgress);
+            float dissolveMask = 1.0 - smoothstep(dissolveFront - uFrontSoftness, dissolveFront + uFrontSoftness, coord);
+            float rebuiltMask = 1.0 - smoothstep(rebuildFront - uFrontSoftness, rebuildFront + uFrontSoftness, coord);
+            float rebuildBlend = smoothstep(0.48, 0.55, cycle);
+            float particleMask = mix(dissolveMask, 1.0 - rebuiltMask, rebuildBlend);
+            float dissolveActive = 1.0 - smoothstep(0.31, 0.46, cycle);
+            float rebuildActive = smoothstep(0.49, 0.56, cycle) * (1.0 - smoothstep(0.82, 0.94, cycle));
+            float dissolveBand = (1.0 - smoothstep(0.0, uFrontWidth, abs(coord - dissolveFront))) * dissolveActive;
+            float rebuildBand = (1.0 - smoothstep(0.0, uFrontWidth, abs(coord - rebuildFront))) * rebuildActive;
+            ReconstructState state;
+            state.particleMask = clamp(particleMask, 0.0, 1.0);
+            state.solidMask = 1.0 - state.particleMask;
+            state.frontBand = max(dissolveBand, rebuildBand);
+            return state;
+          }
+
+          float dither(vec2 position) {
+            return fract(sin(dot(position, vec2(12.9898, 78.233))) * 43758.5453);
+          }
+
+          void main() {
+            ReconstructState state = computeState(vCoord);
+            float coverage = clamp(state.solidMask + state.frontBand * 0.18, 0.0, 1.0) * uSolidCoverage;
+            if (coverage < dither(gl_FragCoord.xy) * 0.82 + 0.08) discard;
+
+            vec3 lightDir = normalize(vec3(0.45, 0.8, 0.36));
+            float light = 0.42 + 0.58 * max(0.0, dot(normalize(vNormalW), lightDir));
+            vec3 base = mix(uDarkColor, uBaseColor, smoothstep(-0.12, 0.2, vWorldPos.z + 0.08));
+            vec3 color = base * light;
+            color = mix(color, uAccentColor, clamp(state.frontBand * 0.32, 0.0, 0.32));
+            gl_FragColor = vec4(color, 1.0);
+          }
+        `
+      });
+    }
+
+    function rebuildParticleLayers() {
+      clearLayers(surfaceLayers);
+      clearLayers(reconstructLayers);
+      updatePartBuildRange();
+
+      const maxPerMesh = Math.floor(9000 * currentDensity);
+      surfaceLayers = meshes.map((mesh, index) => {
+        const geometry = createSurfaceSamples(mesh.geometry, {
+          density: 24000 * currentDensity,
+          maxParticles: maxPerMesh,
+          seed: 31 + index * 17
+        });
+        const points = new THREE.Points(geometry, surfaceParticleMaterial);
+        points.matrixAutoUpdate = false;
+        points.frustumCulled = false;
+        points.renderOrder = 24;
+        scene.add(points);
+        return { sourceMesh: mesh, points, geometry };
+      });
+
+      reconstructLayers = meshes.map((mesh, index) => {
+        const geometry = createSurfaceSamples(mesh.geometry, {
+          density: 52000 * currentDensity,
+          maxParticles: Math.floor(15000 * currentDensity),
+          seed: 103 + index * 23
+        });
+        const points = new THREE.Points(geometry, reconstructParticleMaterial);
+        points.matrixAutoUpdate = false;
+        points.frustumCulled = false;
+        points.renderOrder = 25;
+        scene.add(points);
+        return { sourceMesh: mesh, points, geometry };
+      });
+    }
+
+    function rebuildBlueprintLayers() {
+      clearLayers(blueprintLayers);
+      blueprintLayers = meshes.map((mesh) => {
+        const overlay = new THREE.Mesh(mesh.geometry, blueprintMaterial);
+        overlay.matrixAutoUpdate = false;
+        overlay.frustumCulled = false;
+        overlay.renderOrder = 22;
+        scene.add(overlay);
+        return { sourceMesh: mesh, points: overlay, geometry: null };
+      });
+    }
+
+    function clearLayers(layers) {
+      layers.forEach((layer) => {
+        scene.remove(layer.points);
+        if (layer.geometry) layer.geometry.dispose();
+      });
+      layers.length = 0;
+    }
+
+    function updatePartBuildRange() {
+      const box = new THREE.Box3();
+      const meshBox = new THREE.Box3();
+      box.makeEmpty();
+      meshes.forEach((mesh) => {
+        mesh.updateWorldMatrix(true, false);
+        mesh.geometry.computeBoundingBox();
+        meshBox.copy(mesh.geometry.boundingBox).applyMatrix4(mesh.matrixWorld);
+        box.union(meshBox);
+      });
+      buildRange.set(box.min.y, box.max.y);
+    }
+
+    function createSurfaceSamples(geometry, options) {
+      const position = geometry.getAttribute("position");
+      const normal = geometry.getAttribute("normal");
+      const index = geometry.index;
+      const triangles = [];
+      const a = new THREE.Vector3();
+      const b = new THREE.Vector3();
+      const c = new THREE.Vector3();
+      const ab = new THREE.Vector3();
+      const ac = new THREE.Vector3();
+      let cumulativeArea = 0;
+
+      const pushTriangle = (ia, ib, ic) => {
+        a.fromBufferAttribute(position, ia);
+        b.fromBufferAttribute(position, ib);
+        c.fromBufferAttribute(position, ic);
+        const area = ab.subVectors(b, a).cross(ac.subVectors(c, a)).length() * 0.5;
+        if (area <= 0.00000001) return;
+        cumulativeArea += area;
+        triangles.push({ a: ia, b: ib, c: ic, cumulativeArea });
+      };
+
+      if (index) {
+        for (let i = 0; i + 2 < index.count; i += 3) {
+          pushTriangle(index.getX(i), index.getX(i + 1), index.getX(i + 2));
+        }
+      } else {
+        for (let i = 0; i + 2 < position.count; i += 3) {
+          pushTriangle(i, i + 1, i + 2);
+        }
+      }
+
+      const count = Math.max(1, Math.min(options.maxParticles, Math.ceil(cumulativeArea * options.density)));
+      const positions = new Float32Array(count * 3);
+      const normals = new Float32Array(count * 3);
+      const sizes = new Float32Array(count);
+      const seeds = new Float32Array(count * 4);
+      const random = createSeededRandom(options.seed || 1);
+      const sampleNormal = new THREE.Vector3();
+
+      for (let sampleIndex = 0; sampleIndex < count; sampleIndex += 1) {
+        const triangle = pickTriangle(triangles, random() * cumulativeArea);
+        const r1 = Math.sqrt(random());
+        const r2 = random();
+        const wa = 1 - r1;
+        const wb = r1 * (1 - r2);
+        const wc = r1 * r2;
+        const offset = sampleIndex * 3;
+
+        positions[offset] = interpolate(position, triangle, wa, wb, wc, 0);
+        positions[offset + 1] = interpolate(position, triangle, wa, wb, wc, 1);
+        positions[offset + 2] = interpolate(position, triangle, wa, wb, wc, 2);
+
+        if (normal) {
+          sampleNormal.set(
+            interpolate(normal, triangle, wa, wb, wc, 0),
+            interpolate(normal, triangle, wa, wb, wc, 1),
+            interpolate(normal, triangle, wa, wb, wc, 2)
+          );
+        } else {
+          a.fromBufferAttribute(position, triangle.a);
+          b.fromBufferAttribute(position, triangle.b);
+          c.fromBufferAttribute(position, triangle.c);
+          sampleNormal.subVectors(b, a).cross(ac.subVectors(c, a));
+        }
+        if (sampleNormal.lengthSq() < 0.00000001) {
+          sampleNormal.set(0, 1, 0);
+        } else {
+          sampleNormal.normalize();
+        }
+
+        normals[offset] = sampleNormal.x;
+        normals[offset + 1] = sampleNormal.y;
+        normals[offset + 2] = sampleNormal.z;
+        sizes[sampleIndex] = 0.68 + Math.pow(random(), 1.85) * 0.96 + Math.pow(random(), 8) * 0.54;
+
+        const seedOffset = sampleIndex * 4;
+        seeds[seedOffset] = random();
+        seeds[seedOffset + 1] = random();
+        seeds[seedOffset + 2] = random();
+        seeds[seedOffset + 3] = random();
+      }
+
+      const sampledGeometry = new THREE.BufferGeometry();
+      sampledGeometry.setAttribute("position", new THREE.Float32BufferAttribute(positions, 3));
+      sampledGeometry.setAttribute("aSurfaceNormal", new THREE.Float32BufferAttribute(normals, 3));
+      sampledGeometry.setAttribute("aSize", new THREE.Float32BufferAttribute(sizes, 1));
+      sampledGeometry.setAttribute("aSeed", new THREE.Float32BufferAttribute(seeds, 4));
+      sampledGeometry.computeBoundingSphere();
+      return sampledGeometry;
+    }
+
+    function pickTriangle(triangles, areaTarget) {
+      let low = 0;
+      let high = triangles.length - 1;
+      while (low < high) {
+        const mid = Math.floor((low + high) / 2);
+        if (areaTarget <= triangles[mid].cumulativeArea) {
+          high = mid;
+        } else {
+          low = mid + 1;
+        }
+      }
+      return triangles[low];
+    }
+
+    function interpolate(attribute, triangle, wa, wb, wc, component) {
+      return getComponent(attribute, triangle.a, component) * wa
+        + getComponent(attribute, triangle.b, component) * wb
+        + getComponent(attribute, triangle.c, component) * wc;
+    }
+
+    function getComponent(attribute, index, component) {
+      if (component === 0) return attribute.getX(index);
+      if (component === 1) return attribute.getY(index);
+      if (component === 2) return attribute.getZ(index);
+      return attribute.getW(index);
+    }
+
+    function createSeededRandom(seed) {
+      let state = seed >>> 0;
+      if (state === 0) state = 0x6d2b79f5;
+      return () => {
+        state += 0x6d2b79f5;
+        let value = state;
+        value = Math.imul(value ^ (value >>> 15), value | 1);
+        value ^= value + Math.imul(value ^ (value >>> 7), value | 61);
+        return ((value ^ (value >>> 14)) >>> 0) / 4294967296;
+      };
+    }
+
+    function setMode(nextMode) {
+      mode = nextMode;
+      buildElapsed = 0;
+      document.querySelectorAll("[data-mode]").forEach((button) => {
+        button.classList.toggle("is-active", button.dataset.mode === mode);
+      });
+      document.querySelector("#mode-note").textContent = {
+        B: "PLAN B 使用表面采样点生成 Points 粒子层。",
+        C: "PLAN C 复制同 geometry 的透明 overlay mesh，用 shader 画蓝图结构。",
+        D: "PLAN D 同时渲染实体 dissolve 和星点粒子重构。"
+      }[mode];
+
+      surfaceLayers.forEach((layer) => layer.points.visible = mode === "B");
+      blueprintLayers.forEach((layer) => layer.points.visible = mode === "C");
+      reconstructLayers.forEach((layer) => layer.points.visible = mode === "D");
+      meshes.forEach((mesh) => {
+        mesh.material = mode === "D" ? reconstructSolidMaterial : mesh.userData.baseMaterial;
+      });
+    }
+
+    function bindUi() {
+      document.querySelectorAll("[data-mode]").forEach((button) => {
+        button.addEventListener("click", () => setMode(button.dataset.mode));
+      });
+
+      bindRange("density", (value) => {
+        currentDensity = value;
+        rebuildParticleLayers();
+        setMode(mode);
+      });
+      bindRange("size", (value) => {
+        currentSize = value;
+      });
+      bindRange("speed", (value) => {
+        currentSpeed = value;
+      });
+      bindRange("intensity", (value) => {
+        currentIntensity = value;
+      });
+      bindRange("solid", (value) => {
+        currentSolidCoverage = value;
+      });
+      bindRange("halo-spread", (value) => {
+        currentHaloSpread = value;
+      });
+      bindRange("halo-bloom", (value) => {
+        currentHaloBloom = value;
+      });
+      bindRange("halo-breath", (value) => {
+        currentHaloBreath = value;
+      });
+      document.querySelector("#halo-toggle").addEventListener("click", (event) => {
+        haloEnabled = !haloEnabled;
+        event.currentTarget.classList.toggle("is-active", haloEnabled);
+        event.currentTarget.textContent = haloEnabled ? "Halo enabled" : "Halo disabled";
+      });
+      document.querySelector("#variant").addEventListener("change", (event) => {
+        currentVariant = Number(event.target.value);
+      });
+    }
+
+    function bindRange(id, callback) {
+      const input = document.querySelector(`#${id}`);
+      const output = document.querySelector(`#${id}-value`);
+      const update = () => {
+        const value = Number(input.value);
+        output.textContent = value.toFixed(2);
+        callback(value);
+      };
+      input.addEventListener("input", update);
+      update();
+    }
+
+    function bindPointer() {
+      renderer.domElement.addEventListener("pointermove", (event) => {
+        const rect = renderer.domElement.getBoundingClientRect();
+        pointer.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+        pointer.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+      }, { passive: true });
+
+      renderer.domElement.addEventListener("pointerleave", () => {
+        pointer.set(9, 9);
+        hoverStrength = 0;
+        hasPreviousHoverPoint = false;
+      });
+    }
+
+    function updateHover(deltaTime) {
+      raycaster.setFromCamera(pointer, camera);
+      const hit = raycaster.intersectObjects(meshes, false)[0];
+      const targetStrength = hit ? 1 : 0;
+      hoverStrength += (targetStrength - hoverStrength) * (1 - Math.exp(-deltaTime * 12));
+
+      if (!hit) {
+        hasPreviousHoverPoint = false;
+        return;
+      }
+
+      if (hasPreviousHoverPoint) {
+        hoverDirection.subVectors(hit.point, previousHoverPoint);
+        if (hit.face?.normal) {
+          const normal = hit.face.normal.clone().transformDirection(hit.object.matrixWorld);
+          hoverDirection.addScaledVector(normal, -hoverDirection.dot(normal));
+        }
+        if (hoverDirection.lengthSq() < 0.000001) {
+          hoverDirection.set(1, 0, 0);
+        } else {
+          hoverDirection.normalize();
+        }
+      }
+
+      previousHoverPoint.copy(hit.point);
+      hoverPoint.copy(hit.point);
+      hasPreviousHoverPoint = true;
+    }
+
+    function tick(nowMs) {
+      const deltaTime = Math.min(0.05, clock.getDelta());
+      elapsed = nowMs * 0.001;
+      buildElapsed += deltaTime * currentSpeed;
+      controls.update();
+      updateHover(deltaTime);
+      syncLayerMatrices(surfaceLayers);
+      syncLayerMatrices(reconstructLayers);
+      syncLayerMatrices(blueprintLayers);
+      updateUniforms();
+      renderer.render(scene, camera);
+      renderOuterHalo();
+    }
+
+    function syncLayerMatrices(layers) {
+      layers.forEach((layer) => {
+        layer.points.matrix.copy(layer.sourceMesh.matrixWorld);
+        layer.points.matrixWorld.copy(layer.sourceMesh.matrixWorld);
+      });
+    }
+
+    function syncOuterHaloMaskMeshes() {
+      outerHaloMaskMeshes.forEach(({ sourceMesh, maskMesh }) => {
+        sourceMesh.updateWorldMatrix(true, false);
+        maskMesh.matrix.copy(sourceMesh.matrixWorld);
+        maskMesh.matrixWorld.copy(sourceMesh.matrixWorld);
+        maskMesh.visible = sourceMesh.visible;
+      });
+      outerHaloMaskScene.updateMatrixWorld(true);
+    }
+
+    function renderOuterHalo() {
+      if (!haloEnabled || !outerHaloMaskTarget || !outerHaloBlurTarget || !outerHaloTempTarget) return;
+
+      const previousTarget = renderer.getRenderTarget();
+      const previousAutoClear = renderer.autoClear;
+      const previousClearColor = renderer.getClearColor(new THREE.Color()).clone();
+      const previousClearAlpha = renderer.getClearAlpha();
+
+      syncOuterHaloMaskMeshes();
+
+      renderer.setClearColor(0x000000, 0);
+      renderer.setRenderTarget(outerHaloMaskTarget);
+      renderer.clear(true, true, true);
+      renderer.render(outerHaloMaskScene, camera);
+
+      const blurPasses = [6.0, 12.0];
+      blurPasses.forEach((radius, index) => {
+        outerHaloBlurMaterial.uniforms.tDiffuse.value = index === 0
+          ? outerHaloMaskTarget.texture
+          : outerHaloBlurTarget.texture;
+        outerHaloBlurMaterial.uniforms.uDirection.value.set(1, 0);
+        outerHaloBlurMaterial.uniforms.uRadius.value = radius * currentHaloSpread;
+        renderOuterHaloFullscreen(outerHaloBlurMaterial, outerHaloTempTarget, true);
+
+        outerHaloBlurMaterial.uniforms.tDiffuse.value = outerHaloTempTarget.texture;
+        outerHaloBlurMaterial.uniforms.uDirection.value.set(0, 1);
+        outerHaloBlurMaterial.uniforms.uRadius.value = radius * currentHaloSpread;
+        renderOuterHaloFullscreen(outerHaloBlurMaterial, outerHaloBlurTarget, true);
+      });
+
+      outerHaloCompositeMaterial.uniforms.uMask.value = outerHaloMaskTarget.texture;
+      outerHaloCompositeMaterial.uniforms.uBlur.value = outerHaloBlurTarget.texture;
+      renderer.autoClear = false;
+      renderOuterHaloFullscreen(outerHaloCompositeMaterial, null, false);
+
+      renderer.autoClear = previousAutoClear;
+      renderer.setRenderTarget(previousTarget);
+      renderer.setClearColor(previousClearColor, previousClearAlpha);
+    }
+
+    function renderOuterHaloFullscreen(material, target, clear) {
+      outerHaloQuad.material = material;
+      renderer.setRenderTarget(target);
+      if (clear) {
+        renderer.clear(true, true, true);
+      }
+      renderer.render(outerHaloPassScene, outerHaloPassCamera);
+    }
+
+    function updateUniforms() {
+      surfaceParticleMaterial.uniforms.uTime.value = elapsed * currentSpeed;
+      surfaceParticleMaterial.uniforms.uPointSize.value = 0.012 * currentSize;
+      surfaceParticleMaterial.uniforms.uBuildProgress.value = Math.min(buildElapsed / 1.2, 1);
+      surfaceParticleMaterial.uniforms.uLightProgress.value = Math.max(0, (buildElapsed - 1.2) * 0.28) % 1;
+      surfaceParticleMaterial.uniforms.uLightStrength.value = mode === "B" ? Math.min(Math.max(buildElapsed - 1.2, 0) / 0.35, 1) : 0;
+      surfaceParticleMaterial.uniforms.uHoverStrength.value = hoverStrength;
+      surfaceParticleMaterial.uniforms.uIntensity.value = currentIntensity;
+
+      blueprintMaterial.uniforms.uTime.value = elapsed * currentSpeed;
+      blueprintMaterial.uniforms.uBuildProgress.value = Math.min(buildElapsed / 1.25, 1);
+      blueprintMaterial.uniforms.uVariant.value = currentVariant;
+      blueprintMaterial.uniforms.uIntensity.value = currentIntensity;
+
+      reconstructParticleMaterial.uniforms.uTime.value = elapsed * currentSpeed;
+      reconstructParticleMaterial.uniforms.uPointSize.value = 0.0115 * currentSize;
+      reconstructParticleMaterial.uniforms.uIntensity.value = currentIntensity;
+
+      reconstructSolidMaterial.uniforms.uTime.value = elapsed * currentSpeed;
+      reconstructSolidMaterial.uniforms.uSolidCoverage.value = currentSolidCoverage;
+
+      outerHaloCompositeMaterial.uniforms.uTime.value = elapsed;
+      outerHaloCompositeMaterial.uniforms.uIntensity.value = 1.18;
+      outerHaloCompositeMaterial.uniforms.uBloomStrength.value = currentHaloBloom;
+      outerHaloCompositeMaterial.uniforms.uBreathIntensity.value = currentHaloBreath;
+    }
+
+    function resize() {
+      const width = container.clientWidth || window.innerWidth;
+      const height = container.clientHeight || window.innerHeight;
+      camera.aspect = width / Math.max(1, height);
+      camera.updateProjectionMatrix();
+      renderer.setSize(width, height, false);
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      surfaceParticleMaterial.uniforms.uPixelRatio.value = dpr;
+      reconstructParticleMaterial.uniforms.uPixelRatio.value = dpr;
+      resizeOuterHaloTargets(width, height);
+    }
+
+    function resizeOuterHaloTargets(width, height) {
+      const scale = 0.72;
+      const targetWidth = Math.max(2, Math.ceil(width * scale));
+      const targetHeight = Math.max(2, Math.ceil(height * scale));
+
+      if (!outerHaloMaskTarget) {
+        outerHaloMaskTarget = createOuterHaloTarget(targetWidth, targetHeight, true);
+        outerHaloBlurTarget = createOuterHaloTarget(targetWidth, targetHeight, false);
+        outerHaloTempTarget = createOuterHaloTarget(targetWidth, targetHeight, false);
+      } else {
+        outerHaloMaskTarget.setSize(targetWidth, targetHeight);
+        outerHaloBlurTarget.setSize(targetWidth, targetHeight);
+        outerHaloTempTarget.setSize(targetWidth, targetHeight);
+      }
+
+      outerHaloBlurMaterial.uniforms.uTexelSize.value.set(1 / targetWidth, 1 / targetHeight);
+    }
+
+    function createOuterHaloTarget(width, height, depthBuffer) {
+      const target = new THREE.WebGLRenderTarget(width, height, {
+        depthBuffer,
+        stencilBuffer: false,
+        minFilter: THREE.LinearFilter,
+        magFilter: THREE.LinearFilter,
+        format: THREE.RGBAFormat
+      });
+      target.texture.name = depthBuffer ? "outer-halo-mask" : "outer-halo-blur";
+      return target;
+    }
+
+  </script>
+</body>
+</html>
